@@ -1,0 +1,20 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - generic:
+      - generic:
+        - generic: 印
+      - generic:
+        - button "重新来过"
+        - button "保存为图片"
+  - generic [ref=e20]:
+    - generic [ref=e21]: 🏛️
+    - generic [ref=e22]: 白宫幕僚
+    - generic [ref=e23]: 总统核心幕僚
+    - generic [ref=e24]:
+      - text: 你是总统最信任的核心幕僚之一。在这个位置上，你每天面对的不是"对与错"，而是"哪个代价更小"。
+      - text: 你的每一个建议都可能改变历史——也可能毁掉你自己。
+    - generic [ref=e25]:
+      - text: 今天是关键的一天：晨间简报有紧急情报，内阁会议将爆发争吵，媒体手里有一段可能毁掉一切的录音。
+      - text: 你需要在24小时内做出8个决定。每个决定都会欠下一笔人情债。
+      - text: 你准备好了吗？
+    - button "踏入命运" [ref=e26] [cursor=pointer]

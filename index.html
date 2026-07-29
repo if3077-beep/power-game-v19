@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>权力的游戏 v20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Sans+KR:wght@300;400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="M1-CSS.css">
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div id="cursorGlow"></div>
+<div class="fate-river-wrap" id="fateRiverWrap"><canvas id="fateRiverCanvas"></canvas></div>
+<div class="transition-overlay" id="transitionOverlay"></div>
+<div class="transition-swipe" id="transitionSwipe"></div>
+<div class="vignette" id="vignette"></div>
+<div class="scanline-effect" id="scanline"></div>
+<div class="result-flash" id="resultFlash"></div>
+
+<div class="memorial-overlay" id="memorialOverlay">
+  <div>
+    <div class="memorial-scroll" id="memorialScroll">
+      <div class="ms-seal">印</div>
+      <div class="ms-text" id="memorialText"></div>
+      <div class="ms-signature" id="memorialSign"></div>
+      <div class="ms-date" id="memorialDate"></div>
+    </div>
+    <div class="memorial-btns">
+      <button class="memorial-btn" onclick="closeMemorial()">重新来过</button>
+      <button class="memorial-btn" onclick="saveMemorialAsImage()">保存为图片</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen active" id="landing">
+  <h1>权 力 的 游 戏</h1>
+  <p class="subtitle" id="landingSubtitle"></p>
+  <div class="divider-line"></div>
+  <!-- V19 R4.1: 前期留存钩子 — 试玩预览条(吸引非文字游戏群体) -->
+  <div class="trial-preview" id="trialPreview" role="region" aria-label="快速试玩预览">
+    <div class="trial-card" id="trialCard" role="button" tabindex="0" onclick="startTrialPlay()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();startTrialPlay();}">
+      <div class="trial-scene-tag" id="trialSceneTag">凌晨 3:17 · 白宫</div>
+      <div class="trial-question" id="trialQuestion">总统来电："现在就签这份授权令。" 你签吗？</div>
+      <div class="trial-cta">点击试玩 →</div>
+    </div>
+  </div>
+  <div class="chaos-entry" id="chaosEntry" style="display:none;" onclick="renderPrelude('chaos')">
+    <span class="chaos-entry-line"></span>
+    <span class="chaos-entry-icon">🌀</span>
+    <span class="chaos-entry-label">时空之渊</span>
+    <span class="chaos-entry-line"></span>
+  </div>
+  <div class="choice-cards">
+    <div class="choice-card" data-scenario="ming" onclick="renderPrelude('ming')">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">🏯</span>
+      <div class="card-era">Chapter I — 穿越</div>
+      <h2>大明官场</h2>
+      <p>穿越到万历年间，从七品知县做起。两本账、人情债、派系站队——<br><br>你能在这张网里活几集？</p>
+    </div>
+    <div class="choice-card" data-scenario="ai" id="aiCard" onclick="renderPrelude('ai')" style="display:none;">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">🤖</span>
+      <div class="card-era">Chapter II — 未来</div>
+      <h2>共生时代</h2>
+      <p>2036年，AI有了公民身份。你是第一批协调官，办公桌上摆着三份文件，每份都关乎一个人，或一个AI。<br><br>前任留下的辞职信写着：我再也分不清谁是人了。</p>
+    </div>
+    <div class="choice-card" data-scenario="whitehouse" onclick="renderPrelude('whitehouse')">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">🏛️</span>
+      <div class="card-era">Chapter III — 当代</div>
+      <h2>白宫的一天</h2>
+      <p>晨间简报，内阁争吵，深夜交易。八个场景，二十四小时。<br><br>每一个建议都在改写历史，也可能毁掉你自己。</p>
+    </div>
+    <div class="choice-card" data-scenario="xianjian" onclick="renderPrelude('xianjian')" style="background:linear-gradient(135deg,rgba(122,139,160,0.05),rgba(184,169,212,0.08));">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">🗡️</span>
+      <div class="card-era">Chapter IV — 奇幻</div>
+      <h2>仙剑奇侠传三</h2>
+      <p>渝州城永安当的朝奉，今晨被一柄魔剑和一名红衣女子闯进了人生。<br><br>六界，三生三世，等你一剑一剑走完。</p>
+    </div>
+    <div class="choice-card hidden-road-card" data-scenario="africa" id="africaCard" onclick="renderPrelude('africa')" style="display:none;">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">🌍</span>
+      <div class="card-era">Chapter V — 异星</div>
+      <h2>非洲之心</h2>
+      <p>新星球。你是双语使者，在人和兽群之间传话。<br><br>这里没有对错，只有：你愿不愿意替另一个物种开口。</p>
+    </div>
+    <div class="choice-card hidden-road-card" data-scenario="cyber" id="cyberCard" onclick="renderPrelude('cyber')" style="display:none;">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">⚡</span>
+      <div class="card-era">Chapter VI — 赛博</div>
+      <h2>3077</h2>
+      <p>新东京下城区，黑市摊位上卖着非法改装芯片。公司、领主、革命者，谁都在盯着你这块摊。<br><br>能活到天亮，就是今天的胜利。</p>
+    </div>
+    <div class="choice-card hidden-road-card" data-scenario="korea" id="koreaCard" onclick="renderPrelude('korea')" style="display:none;">
+      <div class="card-atmosphere"></div>
+      <span class="card-icon">🌸</span>
+      <div class="card-era">Chapter VII — 日常</div>
+      <h2>日常投影</h2>
+      <p>首尔，25岁，大学毕业两年，换了三份工作，目前在咖啡店打工。<br><br>没有主线任务，只有今天怎么过。</p>
+    </div>
+    </div>
+  </div>
+  <div class="landing-footer">
+    <button onclick="showGallery()">结局图鉴</button>
+  </div>
+</div>
+
+<div class="screen" id="intro-screen"></div>
+
+<div class="screen" id="game-screen">
+  <div class="game-header">
+    <span class="scenario-label" id="scenarioLabel"></span>
+    <span class="level-indicator" id="levelIndicator"></span>
+    <button class="audio-btn" id="audioBtn" onclick="toggleAudio()">♪</button>
+    <button class="back-btn" onclick="confirmExit()">返回首页</button>
+  </div>
+  <div class="channels-bar" id="channelsBar">
+    <span class="ch-label">消息渠道</span>
+    <div class="ch-dots" id="channelDots"></div>
+    <span class="ch-status" id="channelStatus"></span>
+  </div>
+  <div class="game-layout">
+    <div class="game-main">
+      <div class="scene-container" id="sceneContainer"></div>
+      <div class="game-mobile-debt" id="mobileDebt">
+        <div class="debt-panel-title">人情债记录本</div>
+        <div class="debt-scroll-mobile" id="mobileDebtScroll"></div>
+      </div>
+    </div>
+  </div>
+  <div class="debt-panel" id="debtPanel">
+    <div class="debt-panel-title">人情债记录本</div>
+    <div class="debt-scroll" id="debtScroll"></div>
+    <div class="debt-count" id="debtCount"></div>
+    <div class="radar-section" id="radarSection">
+      <div class="radar-title">— 你的画像 —</div>
+      <div class="radar-canvas-wrap"><canvas id="radarCanvas"></canvas></div>
+    </div>
+  </div>
+  <div class="debt-panel-toggle" id="debtToggle" onclick="toggleDebtPanel()">卷 轴</div>
+</div>
+
+<!-- V14: 前置动画屏幕 -->
+<div class="screen" id="prelude-screen"></div>
+
+<!-- V18: 校准屏幕 -->
+<div class="screen" id="calibrate-screen"></div>
+
+<div class="screen" id="ending-screen"></div>
+<div class="screen" id="gallery-screen"></div>
+
+<script>
+// V19 R4.4: ModuleGuard — 模块加载守护,检测关键模块加载失败并显示兜底 UI
+(function(){
+  var MODULES = [
+    { name: 'analysis-engine.js', check: function(){ return typeof AnalysisEngine !== 'undefined'; } },
+    { name: 'evo-lite.js', check: function(){ return typeof EvoLite !== 'undefined'; } },
+    { name: 'calibrate.js', check: function(){ return typeof CalibratePanel !== 'undefined'; } },
+    { name: 'M4-Data-WhiteHouse.js', check: function(){ return typeof whitehouseData !== 'undefined'; } },
+    { name: 'M5-Data-Ming.js', check: function(){ return typeof mingData !== 'undefined'; } },
+    { name: 'M3-Engine.js', check: function(){ return typeof AudioEngine !== 'undefined'; } },
+    { name: 'M6-Mechanics.js', check: function(){ return typeof scenarios !== 'undefined'; } },
+  ];
+  window.__moduleCheck = function(){
+    var failed = [];
+    for (var i = 0; i < MODULES.length; i++) {
+      try { if (!MODULES[i].check()) failed.push(MODULES[i].name); }
+      catch(e){ failed.push(MODULES[i].name); }
+    }
+    return failed;
+  };
+  window.__showModuleError = function(failed){
+    var box = document.createElement('div');
+    box.id = 'moduleGuardError';
+    box.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(10,8,6,0.96);padding:2rem;font-family:serif;';
+    box.innerHTML = '<div style="max-width:520px;text-align:center;color:#c9a96e;">'
+      + '<div style="font-size:1.4rem;margin-bottom:1rem;letter-spacing:0.1em;">模块加载失败</div>'
+      + '<div style="font-size:0.85rem;color:#8a7a5a;line-height:1.8;margin-bottom:1.5rem;">以下文件未正确加载,游戏可能无法正常运行:</div>'
+      + '<div style="font-size:0.78rem;color:#b45c4a;font-family:monospace;line-height:1.9;margin-bottom:1.5rem;">' + failed.join('<br>') + '</div>'
+      + '<div style="font-size:0.8rem;color:#8a7a5a;margin-bottom:1rem;">建议刷新页面重试;若问题持续,请检查网络或部署配置。</div>'
+      + '<button onclick="location.reload()" style="padding:0.6rem 2rem;background:rgba(201,169,110,0.1);border:1px solid #c9a96e;color:#c9a96e;font-family:serif;cursor:pointer;letter-spacing:0.1em;">刷新页面</button>'
+      + '</div>';
+    document.body.appendChild(box);
+  };
+  // DOMContentLoaded 后检查
+  window.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      var failed = window.__moduleCheck();
+      if (failed.length > 0) {
+        console.error('[ModuleGuard] 加载失败的模块:', failed);
+        window.__showModuleError(failed);
+      } else {
+        console.log('[ModuleGuard] 所有关键模块加载完成 ✓');
+      }
+    }, 100);
+  });
+})();
+</script>
+<script src="analysis-engine.js"></script>
+<script src="analysis-renderer.js"></script>
+<script src="evo-lite.js"></script>
+<script src="calibrate.js"></script>
+<script src="M4-Data-WhiteHouse.js"></script>
+<script src="M5-Data-Ming.js"></script>
+<script src="M7-Data-AI.js"></script>
+<script src="M8-Data-Africa.js"></script>
+<script src="M9-Data-3077.js"></script>
+<script src="M10-Data-Korea.js"></script>
+<script src="M11-Data-Chaos.js"></script>
+<script src="M12-Data-Xianjian.js"></script>
+<script src="M3-Engine.js"></script>
+<script src="M6-Mechanics.js"></script>
+<script>
+// V20 R6: 首页 UI 三套变体随机切换 — 现有(grid)20% / 列表变体40% / 沉浸变体40%
+(function pickLandingVariant() {
+  const landing = document.getElementById('landing');
+  if (!landing) return;
+  // V20 R9 (P2-1): 优先读取 sessionStorage 缓存的变体,避免刷新跳变;仅无缓存时随机
+  let variant = null;
+  try { variant = sessionStorage.getItem('landingVariant'); } catch(e){}
+  if (variant !== 'ui-grid' && variant !== 'ui-list' && variant !== 'ui-cinematic') {
+    const r = Math.random();
+    variant = 'ui-grid'; // 默认 20%
+    if (r >= 0.20 && r < 0.60) variant = 'ui-list';
+    else if (r >= 0.60) variant = 'ui-cinematic';
+    try { sessionStorage.setItem('landingVariant', variant); } catch(e){}
+  }
+  landing.classList.add(variant);
+})();
+</script>
+
+<script>
+// V14.3: 隐藏道路解锁状态 — 未解锁时显示锁定占位卡
+(function() {
+  const lockInfo = {
+    ai: { hint: '🔒 通关「白宫」或「大明」后解锁', fullText: '共生时代 · 2036年。解锁后：在人类与AI之间搭建信任的桥梁。' },
+    africa: { hint: '🔒 在白宫道路做出「非我族类」的选择', fullText: '非洲之心 · 异星大地。解锁后：成为人类与兽群的双语使者。' },
+    cyber: { hint: '🔒 在AI道路见证一次「觉醒」事件', fullText: '3077 · 赛博贫民窟。解锁后：在机器的世界里守住人性。' },
+    korea: { hint: '🔒 在大明道路经历「同窗来访」', fullText: '日常投影 · 首尔。解锁后：在咖啡店的日常里，过自己的人生。' },
+  };
+  Object.entries(lockInfo).forEach(([road, info]) => {
+    const card = document.getElementById(road + 'Card');
+    if (!card) return;
+    if (localStorage.getItem(road + 'Unlocked')) {
+      card.style.display = '';
+      const lockEl = card.querySelector('.card-lock');
+      if (lockEl) lockEl.remove();
+    } else if (road === 'ai' && Math.random() < 0.3) {
+      card.style.display = '';
+      localStorage.setItem('aiUnlocked', 'true');
+      const lockEl = card.querySelector('.card-lock');
+      if (lockEl) lockEl.remove();
+    } else {
+      // 显示锁定占位卡
+      card.style.display = '';
+      card.classList.add('locked-road');
+      card.setAttribute('onclick', '');
+      card.style.cursor = 'default';
+      const p = card.querySelector('p');
+      if (p) p.innerHTML = info.fullText;
+      // 移除点击事件，添加锁定标识
+      const era = card.querySelector('.card-era');
+      if (era) era.textContent = info.hint;
+    }
+  });
+  // 混沌道路
+  const chaosEntry = document.getElementById('chaosEntry');
+  if (chaosEntry && localStorage.getItem('chaosUnlocked')) {
+    chaosEntry.style.display = '';
+  }
+})();
+// V18 Round 3: 可访问性增强 — 键盘导航 + ARIA + 焦点管理
+(function initA11y() {
+  // 1. 全局键盘委托: Enter/Space 激活 [role="button"] 与带 onclick 的非表单元素
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target;
+    if (!el || el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
+    if (el.getAttribute('role') === 'button' || el.hasAttribute('onclick') || el.classList.contains('choice-card') || el.classList.contains('chaos-entry')) {
+      e.preventDefault();
+      el.click();
+    }
+  }, { passive: false });
+  // 2. 为可点击 div 增强 role + tabindex (landing 卡牌 / 混沌入口 / 道路卡)
+  function enhanceClickable() {
+    const sel = '.choice-card, .chaos-entry, [onclick]:not(button):not(a):not(input):not(textarea)';
+    document.querySelectorAll(sel).forEach(el => {
+      if (!el.getAttribute('role')) el.setAttribute('role', 'button');
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    });
+  }
+  enhanceClickable();
+  // 3. canvas aria-label — 让屏幕阅读器理解装饰性画布
+  const canvasLabels = {
+    'particles': '装饰性粒子背景动画',
+    'fateRiverCanvas': '命运河流 — 你的每次选择在此留下流光',
+    'radarCanvas': '五维选择画像雷达图',
+    'endingRadarCanvas': '本局选择画像雷达快照'
+  };
+  Object.entries(canvasLabels).forEach(([id, label]) => {
+    const c = document.getElementById(id);
+    if (c) { c.setAttribute('role', 'img'); c.setAttribute('aria-label', label); }
+  });
+  // 4. 焦点管理 — 屏幕切换时把焦点移到新屏幕 (键盘用户受益)
+  const _origShowScreen = window.showScreen;
+  if (typeof _origShowScreen === 'function') {
+    window.showScreen = function(id) {
+      const ret = _origShowScreen.apply(this, arguments);
+      const screen = document.getElementById(id);
+      if (screen) {
+        // 让屏幕可获焦但不破坏布局
+        screen.setAttribute('tabindex', '-1');
+        // 延迟聚焦, 等待转场动画渲染
+        setTimeout(() => { try { screen.focus({ preventScroll: true }); } catch(e){} }, 120);
+      }
+      return ret;
+    };
+  }
+  // 5. 跳过链接 (动态注入) — 键盘用户跳到主内容
+  const skip = document.createElement('a');
+  skip.href = '#landing';
+  skip.className = 'skip-link';
+  skip.textContent = '跳到主内容';
+  document.body.insertBefore(skip, document.body.firstChild);
+  // DOM 变更后重新增强 (动态生成的卡牌) — 防抖避免频繁扫描
+  let _enhanceTimer = null;
+  const obs = new MutationObserver(() => {
+    if (_enhanceTimer) return;
+    _enhanceTimer = setTimeout(() => { enhanceClickable(); _enhanceTimer = null; }, 200);
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
+})();
+// V14.6: 首页初始化 — 卡牌hover音效+标题乱码
+initLanding();
+</script>
+</body>
+</html>

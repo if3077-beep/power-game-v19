@@ -1,0 +1,245 @@
+- generic [ref=e2]:
+  - text: ✓
+  - generic [ref=e201]:
+    - generic [ref=e202]:
+      - generic [ref=e203]: 🔥
+      - generic [ref=e204]: 残酷的真相是：我能感受到你内心的不安。你想要一个确定的答案，但人生有时候就是没有标准答案。
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - generic [ref=e208]: 🧠
+        - generic [ref=e209]: 性格分析
+      - generic [ref=e210]: ISFJ
+      - generic [ref=e211]: 置信度 84%
+      - generic [ref=e212]:
+        - generic [ref=e213]:
+          - generic [ref=e214]: 外向
+          - generic [ref=e217]: 内向
+          - generic [ref=e218]: I
+        - generic [ref=e219]:
+          - generic [ref=e220]: 感觉
+          - generic [ref=e223]: 直觉
+          - generic [ref=e224]: S
+        - generic [ref=e225]:
+          - generic [ref=e226]: 思考
+          - generic [ref=e228]: 情感
+          - generic [ref=e229]: F
+        - generic [ref=e230]:
+          - generic [ref=e231]: 判断
+          - generic [ref=e233]: 感知
+          - generic [ref=e234]: J
+      - generic [ref=e235]:
+        - generic [ref=e236]:
+          - strong [ref=e237]: 视角：
+          - text: 守护视角
+        - generic [ref=e238]:
+          - strong [ref=e239]: 语气：
+          - text: 关怀、考虑周全
+        - generic [ref=e240]:
+          - strong [ref=e241]: 建议方式：
+          - text: 帮你平衡责任和自我
+    - generic [ref=e242]:
+      - generic [ref=e243]: 三条推演路径
+      - generic [ref=e244]: 每条路径只讲关键转折，不废话
+    - generic [ref=e245]:
+      - generic [ref=e246]:
+        - generic [ref=e247]: 24%
+        - generic [ref=e248]: 乐观
+      - generic [ref=e249]:
+        - generic [ref=e250]: 46%
+        - generic [ref=e251]: 中性
+      - generic [ref=e252]:
+        - generic [ref=e253]: 30%
+        - generic [ref=e254]: 悲观
+    - generic [ref=e255]:
+      - generic [ref=e256]:
+        - generic [ref=e257]:
+          - generic [ref=e258]: 🌅
+          - generic [ref=e259]: 乐观路径
+          - generic [ref=e260]: 24%
+        - generic [ref=e261]:
+          - generic [ref=e262]: 说白了就是：找到新方向，职业重新起飞
+          - generic [ref=e263]:
+            - generic [ref=e264]:
+              - generic [ref=e265]: 第1-2周
+              - generic [ref=e266]: 更新简历、终于投递，获得几个面试机会
+            - generic [ref=e267]:
+              - generic [ref=e268]: 第3-4周
+              - generic [ref=e269]: 面试中更清晰自己的定位，收到1-2个offer
+            - generic [ref=e270]:
+              - generic [ref=e271]: 第2-3个月
+              - generic [ref=e272]: 进入新环境，成长速度明显加快
+          - generic [ref=e273]:
+            - strong [ref=e274]: 代价：
+            - text: 选了这条路，你得做好准备：目前的舒适区和稳定的收入来源
+          - generic [ref=e275]:
+            - strong [ref=e276]: 不行动：
+            - text: 三个月后你还是现在这个鬼样子——你会继续坐在那个位置上，看着比你年轻的人一个个超过你
+          - generic [ref=e277]: ⚡ 经济上的缓冲给了你试错的底气
+      - generic [ref=e278]:
+        - generic [ref=e279]:
+          - generic [ref=e280]: 🌊
+          - generic [ref=e281]: 中性路径
+          - generic [ref=e282]: 46%
+        - generic [ref=e283]:
+          - generic [ref=e284]: 说白了就是：原地调整，在现有位置上寻找突破
+          - generic [ref=e285]:
+            - generic [ref=e286]:
+              - generic [ref=e287]: 第1-2周
+              - generic [ref=e288]: 和领导表达了想尝试新方向的想法
+            - generic [ref=e289]:
+              - generic [ref=e290]: 第3-4周
+              - generic [ref=e291]: 你和同事吐槽了一下工作，感觉好了一点但问题没变
+            - generic [ref=e292]:
+              - generic [ref=e293]: 第2-3个月
+              - generic [ref=e294]: 新项目有进展，但核心问题仍在
+          - generic [ref=e295]:
+            - strong [ref=e296]: 代价：
+            - text: 选了这条路，你得做好准备：跳槽的最佳窗口期
+          - generic [ref=e297]:
+            - strong [ref=e298]: 不行动：
+            - text: 三个月后你还是现在这个鬼样子——两年后你还是在同一个工位上
+          - generic [ref=e299]: ⚡ 经济压力让你不敢轻举妄动
+      - generic [ref=e300]:
+        - generic [ref=e301]:
+          - generic [ref=e302]: 🌧️
+          - generic [ref=e303]: 悲观路径
+          - generic [ref=e304]: 30%
+        - generic [ref=e305]:
+          - generic [ref=e306]: 说白了就是：继续消耗，职业倦怠加深
+          - generic [ref=e307]:
+            - generic [ref=e308]:
+              - generic [ref=e309]: 第1-2周
+              - generic [ref=e310]: 投了几份简历但回复寥寥
+            - generic [ref=e311]:
+              - generic [ref=e312]: 第3-4周
+              - generic [ref=e313]: 面试了几家但都不合适
+            - generic [ref=e314]:
+              - generic [ref=e315]: 第2-3个月
+              - generic [ref=e316]: 面试官问你"为什么想离开上一家"，你答得磕磕巴巴
+          - generic [ref=e317]:
+            - strong [ref=e318]: 代价：
+            - text: 选了这条路，你得做好准备：自信——每一次被拒都在告诉你"你不行"
+          - generic [ref=e319]:
+            - strong [ref=e320]: 不行动：
+            - text: 三个月后你还是现在这个鬼样子——你会变成那种每天数着下班时间的人
+          - generic [ref=e321]: ⚡ 钱的问题成了压垮你的最后一根稻草
+    - generic [ref=e322]:
+      - generic [ref=e323]: 未来三个月最可能发生的三件烂事
+      - generic [ref=e324]:
+        - generic [ref=e325]:
+          - generic [ref=e326]: 😴
+          - generic [ref=e327]: 听好了——周一早上闹钟响了三遍你才起来
+        - generic [ref=e328]:
+          - generic [ref=e329]: 📧
+          - generic [ref=e330]: 听好了——你收到一封"关于组织架构调整的通知"
+        - generic [ref=e331]:
+          - generic [ref=e332]: 🪞
+          - generic [ref=e333]: 听好了——面试时被问"你的核心竞争力是什么"，你卡壳了
+    - generic [ref=e334]:
+      - generic [ref=e335]: 真实数据
+      - generic [ref=e336]:
+        - generic [ref=e337]:
+          - generic [ref=e338]: 43%
+          - generic [ref=e339]: 裸辞后悔率
+          - generic: 裸辞者中有43%在三个月内后悔
+          - generic: 智联招聘调研
+        - generic [ref=e340]:
+          - generic [ref=e341]: 2.8年
+          - generic [ref=e342]: 平均跳槽间隔
+          - generic: Z世代平均每2.8年跳槽一次
+          - generic: 领英职场报告
+        - generic [ref=e343]:
+          - generic [ref=e344]: 67%
+          - generic [ref=e345]: 副业失败率
+          - generic: 尝试副业的人中67%在半年内放弃
+          - generic: DT财经
+    - generic [ref=e346]:
+      - generic [ref=e347]: 延伸阅读
+      - generic [ref=e348]:
+        - generic [ref=e349]:
+          - generic [ref=e350]:
+            - generic [ref=e351]: 💬
+            - generic [ref=e352]: 名言
+          - generic [ref=e353]: 选择比努力更重要，但选择本身就是一种需要努力培养的能力。
+          - generic [ref=e354]: —— 查理·芒格
+        - generic [ref=e355]:
+          - generic [ref=e356]:
+            - generic [ref=e357]: 📜
+            - generic [ref=e358]: 历史类比
+          - generic [ref=e359]: J.K.罗琳写《哈利·波特》时是单亲妈妈、靠救济金生活，手稿被12家出版社拒绝。如果她在第11次拒绝后放弃，就不会有魔法世界。
+        - generic [ref=e360]:
+          - generic [ref=e361]:
+            - generic [ref=e362]: 🧠
+            - generic [ref=e363]: 沉没成本谬误
+          - generic [ref=e364]: 已经在一份工作上投入了太多时间，所以不舍得离开——这是典型的沉没成本谬误。
+          - generic [ref=e365]: —— 丹尼尔·卡尼曼
+    - generic [ref=e367]:
+      - generic [ref=e368]: 哪个结局最像你？
+      - generic [ref=e369]:
+        - generic [ref=e370] [cursor=pointer]:
+          - generic [ref=e371]: 🌅
+          - generic [ref=e372]: 乐观路径——我就是这么想的
+        - generic [ref=e373] [cursor=pointer]:
+          - generic [ref=e374]: 🌊
+          - generic [ref=e375]: 中性路径——大概率就这样
+        - generic [ref=e376] [cursor=pointer]:
+          - generic [ref=e377]: 🌧️
+          - generic [ref=e378]: 悲观路径——我怕的就是这个
+    - generic [ref=e380]:
+      - generic [ref=e382]:
+        - generic [ref=e383]: 🎨
+        - generic [ref=e384]:
+          - generic [ref=e385]: Emoji 合成器
+          - generic [ref=e386]: 拖拽移动 · 滚轮/双指缩放 · 双击删除
+      - generic [ref=e387]:
+        - textbox "输入关键词（如：焦虑、爱情、工作）" [ref=e388]
+        - button "生成" [ref=e389] [cursor=pointer]
+        - button "随机" [ref=e390] [cursor=pointer]
+      - generic [ref=e391]:
+        - generic: 拖拽移动 · 滚轮/双指缩放 · 双击删除
+      - generic [ref=e393]:
+        - generic [ref=e394]:
+          - button "焦虑" [ref=e395] [cursor=pointer]
+          - button "爱情" [ref=e396] [cursor=pointer]
+          - button "工作" [ref=e397] [cursor=pointer]
+          - button "开心" [ref=e398] [cursor=pointer]
+          - button "难过" [ref=e399] [cursor=pointer]
+          - button "愤怒" [ref=e400] [cursor=pointer]
+          - button "迷茫" [ref=e401] [cursor=pointer]
+          - button "恐惧" [ref=e402] [cursor=pointer]
+          - button "期待" [ref=e403] [cursor=pointer]
+          - button "平静" [ref=e404] [cursor=pointer]
+          - button "旅行" [ref=e405] [cursor=pointer]
+          - button "美食" [ref=e406] [cursor=pointer]
+          - button "音乐" [ref=e407] [cursor=pointer]
+          - button "运动" [ref=e408] [cursor=pointer]
+          - button "学习" [ref=e409] [cursor=pointer]
+          - button "睡觉" [ref=e410] [cursor=pointer]
+          - button "家庭" [ref=e411] [cursor=pointer]
+          - button "金钱" [ref=e412] [cursor=pointer]
+          - button "自然" [ref=e413] [cursor=pointer]
+          - button "科技" [ref=e414] [cursor=pointer]
+        - generic [ref=e415]:
+          - button "😰" [ref=e416] [cursor=pointer]
+          - button "😨" [ref=e417] [cursor=pointer]
+          - button "😱" [ref=e418] [cursor=pointer]
+          - button "🌀" [ref=e419] [cursor=pointer]
+          - button "💔" [ref=e420] [cursor=pointer]
+      - generic [ref=e421]:
+        - button "清空" [ref=e422] [cursor=pointer]
+        - button "撤销" [ref=e423] [cursor=pointer]
+    - generic [ref=e425]:
+      - generic [ref=e426]: 给这个推演打个分（1-5星）
+      - generic [ref=e427]:
+        - generic [ref=e428] [cursor=pointer]: ⭐
+        - generic [ref=e429] [cursor=pointer]: ⭐
+        - generic [ref=e430] [cursor=pointer]: ⭐
+        - generic [ref=e431] [cursor=pointer]: ⭐
+        - generic [ref=e432] [cursor=pointer]: ⭐
+      - generic [ref=e433]:
+        - textbox "它漏掉了什么？（可选）" [ref=e434]
+        - button "提交" [ref=e435] [cursor=pointer]
+    - generic [ref=e436]:
+      - button "📸 保存截图" [ref=e437] [cursor=pointer]
+      - button "📋 复制摘要" [ref=e438] [cursor=pointer]
+      - button "🔄 新的推演" [ref=e439] [cursor=pointer]

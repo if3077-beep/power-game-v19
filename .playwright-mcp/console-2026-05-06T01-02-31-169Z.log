@@ -1,0 +1,4 @@
+[     270ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8091/favicon.ico:0
+[    1638ms] [ERROR] Access to fetch at 'https://zenquotes.io/api/today' from origin 'http://localhost:8091' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:8091/index.html:0
+[    1639ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://zenquotes.io/api/today:0
+[   63280ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8091/favicon.ico:0

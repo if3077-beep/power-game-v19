@@ -1,0 +1,27 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - generic:
+      - generic:
+        - generic: 印
+      - generic:
+        - button "重新来过"
+        - button "保存为图片"
+  - generic [ref=e2]:
+    - heading "权 力 的 游 戏" [level=1] [ref=e3]
+    - paragraph [ref=e4]: 每一个选择都在书写你的政治墓志铭
+    - generic [ref=e6]:
+      - generic [ref=e7] [cursor=pointer]:
+        - generic [ref=e8]: 🏛️
+        - generic [ref=e9]: Chapter I — 当代
+        - heading "白宫的一天" [level=2] [ref=e10]
+        - paragraph [ref=e11]:
+          - text: 从晨间简报到深夜交易，八个场景，每一次表态都是债务，每一次沉默也是。
+          - text: 你不是在闯关——你是在写自己的政治墓志铭。
+      - generic [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: 🏯
+        - generic [ref=e14]: Chapter II — 穿越
+        - heading "大明官场" [level=2] [ref=e15]
+        - paragraph [ref=e16]:
+          - text: 穿越到万历年间，从七品知县做起。两本账、人情债、派系站队——
+          - text: 你能在这张网里活几集？
+    - button "结局图鉴" [ref=e18] [cursor=pointer]

@@ -1,0 +1,114 @@
+- generic [ref=e66]:
+  - generic [ref=e67]:
+    - button "← 返回" [ref=e68] [cursor=pointer]
+    - heading "校准推演参数" [level=2] [ref=e69]
+  - generic [ref=e71]: 💼 辞职
+  - generic [ref=e72]:
+    - generic [ref=e73]: 先告诉我们你的性格偏好
+    - generic [ref=e74]: 这会让我们更准确地分析你（可跳过）
+    - generic [ref=e75]:
+      - generic [ref=e76]: 周末你更想怎么过？
+      - generic [ref=e77]:
+        - button "🎉 和朋友出去浪 ✓" [ref=e78] [cursor=pointer]:
+          - generic [ref=e79]: 🎉
+          - generic [ref=e80]: 和朋友出去浪
+          - generic: ✓
+        - button "🏠 一个人待着充电 ✓" [ref=e81] [cursor=pointer]:
+          - generic [ref=e82]: 🏠
+          - generic [ref=e83]: 一个人待着充电
+          - generic [ref=e174]: ✓
+    - generic [ref=e84]:
+      - generic [ref=e85]: 你更关注什么？
+      - generic [ref=e86]:
+        - button "📋 眼前的事实和细节 ✓" [ref=e87] [cursor=pointer]:
+          - generic [ref=e88]: 📋
+          - generic [ref=e89]: 眼前的事实和细节
+          - generic: ✓
+        - button "🔮 未来的可能性和大局 ✓" [ref=e90] [cursor=pointer]:
+          - generic [ref=e91]: 🔮
+          - generic [ref=e92]: 未来的可能性和大局
+          - generic: ✓
+    - generic [ref=e93]:
+      - generic [ref=e94]: 做决定时你更依赖什么？
+      - generic [ref=e95]:
+        - button "⚖️ 逻辑分析利弊 ✓" [ref=e96] [cursor=pointer]:
+          - generic [ref=e97]: ⚖️
+          - generic [ref=e98]: 逻辑分析利弊
+          - generic: ✓
+        - button "❤️ 内心感受和价值观 ✓" [ref=e99] [cursor=pointer]:
+          - generic [ref=e100]: ❤️
+          - generic [ref=e101]: 内心感受和价值观
+          - generic: ✓
+    - generic [ref=e102]:
+      - generic [ref=e103]: 你的生活方式更偏向？
+      - generic [ref=e104]:
+        - button "📅 有计划、有秩序 ✓" [ref=e105] [cursor=pointer]:
+          - generic [ref=e106]: 📅
+          - generic [ref=e107]: 有计划、有秩序
+          - generic: ✓
+        - button "🎲 灵活随机、看情况 ✓" [ref=e108] [cursor=pointer]:
+          - generic [ref=e109]: 🎲
+          - generic [ref=e110]: 灵活随机、看情况
+          - generic: ✓
+  - generic [ref=e111]:
+    - generic [ref=e112]: 选择推演口吻
+    - generic [ref=e113]:
+      - button "🔥 毒舌朋友 直接骂醒你，不给面子" [ref=e114] [cursor=pointer]:
+        - generic [ref=e115]: 🔥
+        - generic [ref=e116]: 毒舌朋友
+        - generic [ref=e117]: 直接骂醒你，不给面子
+      - button "🪞 年长10岁的自己 讲真实教训，像照镜子" [ref=e118] [cursor=pointer]:
+        - generic [ref=e119]: 🪞
+        - generic [ref=e120]: 年长10岁的自己
+        - generic [ref=e121]: 讲真实教训，像照镜子
+      - button "🤝 过来人 同样困境的人，分享选择" [ref=e122] [cursor=pointer]:
+        - generic [ref=e123]: 🤝
+        - generic [ref=e124]: 过来人
+        - generic [ref=e125]: 同样困境的人，分享选择
+  - generic [ref=e126]:
+    - generic [ref=e127]:
+      - generic [ref=e128]:
+        - generic [ref=e129]: 影响范围
+        - generic [ref=e130]: 仅自己
+      - slider [ref=e131]: "1"
+      - generic [ref=e132]:
+        - generic [ref=e133]: 仅自己
+        - generic [ref=e134]: 全社会
+    - generic [ref=e135]:
+      - generic [ref=e136]:
+        - generic [ref=e137]: 情绪强度
+        - generic [ref=e138]: 中等
+      - slider [ref=e139]: "3"
+      - generic [ref=e140]:
+        - generic [ref=e141]: 微弱
+        - generic [ref=e142]: 剧烈
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - generic [ref=e145]: 推演时间跨度
+        - generic [ref=e146]: 一个月
+      - slider [ref=e147]: "3"
+      - generic [ref=e148]:
+        - generic [ref=e149]: 一周
+        - generic [ref=e150]: 一年
+    - generic [ref=e151]:
+      - generic [ref=e152]:
+        - generic [ref=e153]: 不确定性
+        - generic [ref=e154]: 中等
+      - slider [ref=e155]: "3"
+      - generic [ref=e156]:
+        - generic [ref=e157]: 几乎确定
+        - generic [ref=e158]: 完全未知
+  - generic [ref=e159]:
+    - generic [ref=e160]: 外部影响因素（可多选）
+    - generic [ref=e161]:
+      - button "📱 社交媒体放大" [ref=e162] [cursor=pointer]
+      - button "👔 权威介入" [ref=e163] [cursor=pointer]
+      - button "👥 同辈压力" [ref=e164] [cursor=pointer]
+      - button "✓ 💰 经济因素" [active] [ref=e175] [cursor=pointer]
+      - button "⏰ 时间紧迫" [ref=e166] [cursor=pointer]
+      - button "🎭 面子/声誉" [ref=e167] [cursor=pointer]
+      - button "❤️ 健康相关" [ref=e168] [cursor=pointer]
+      - button "👨‍👩‍👧 家庭牵扯" [ref=e169] [cursor=pointer]
+    - generic [ref=e176]: ⚡经济因素会限制你的选择空间
+  - button "开始推演" [ref=e171] [cursor=pointer]:
+    - generic [ref=e172]: 开始推演

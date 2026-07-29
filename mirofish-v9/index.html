@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiroFish v9 - 未来推演</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23a855f7'/><circle cx='16' cy='16' r='6' fill='%230a0a0f'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">正在分析...</div>
+    <div class="loading-insight" id="loadingInsightText"></div>
+    <div class="loading-progress">
+      <div class="loading-progress-bar" id="loadingProgress"></div>
+    </div>
+  </div>
+
+  <!-- ===== Hero Section ===== -->
+  <section id="hero" class="section">
+    <div class="container">
+      <h1 class="hero-title">MiroFish</h1>
+      <p class="hero-subtitle">告诉我你的处境，用三条路径推演你的未来</p>
+
+      <div class="daily-quote" id="dailyQuote"></div>
+
+      <div class="input-area">
+        <textarea id="userInput" placeholder="试着这样写：我在考虑要不要接手家族生意，但怕做不好；或者：最近总失眠，工作压力大到喘不过气..."></textarea>
+
+        <div class="mood-selector">
+          <button class="mood-btn" data-mood="anxious">焦虑</button>
+          <button class="mood-btn" data-mood="angry">愤怒</button>
+          <button class="mood-btn" data-mood="sad">难过</button>
+          <button class="mood-btn" data-mood="confused">迷茫</button>
+          <button class="mood-btn" data-mood="hopeful">期待</button>
+          <button class="mood-btn" data-mood="fearful">恐惧</button>
+          <button class="mood-btn" data-mood="neutral">平静</button>
+          <button class="mood-btn" data-mood="excited">兴奋</button>
+        </div>
+
+        <div class="controls-row">
+          <select id="slScope">
+            <option value="1">仅自己</option>
+            <option value="2" selected>身边几个人</option>
+            <option value="3">一个群体</option>
+            <option value="4">大范围</option>
+            <option value="5">全社会</option>
+          </select>
+          <select id="slIntensity">
+            <option value="1">微弱</option>
+            <option value="2">轻微</option>
+            <option value="3" selected>中等</option>
+            <option value="4">强烈</option>
+            <option value="5">剧烈</option>
+          </select>
+          <select id="slTime">
+            <option value="1">一周</option>
+            <option value="2">两周</option>
+            <option value="3" selected>一个月</option>
+            <option value="4">三个月</option>
+            <option value="5">一年</option>
+          </select>
+          <select id="slUncertainty">
+            <option value="1">几乎确定</option>
+            <option value="2">比较确定</option>
+            <option value="3" selected>中等</option>
+            <option value="4">不确定</option>
+            <option value="5">完全未知</option>
+          </select>
+        </div>
+
+        <div class="factors-grid">
+          <button class="factor-chip" data-factor="media">社交媒体</button>
+          <button class="factor-chip" data-factor="authority">权威介入</button>
+          <button class="factor-chip" data-factor="peer">同辈压力</button>
+          <button class="factor-chip" data-factor="money">经济因素</button>
+          <button class="factor-chip" data-factor="time">时间紧迫</button>
+          <button class="factor-chip" data-factor="reputation">面子/声誉</button>
+          <button class="factor-chip" data-factor="health">健康相关</button>
+          <button class="factor-chip" data-factor="family">家庭牵扯</button>
+        </div>
+
+        <div class="controls-row mt-16">
+          <button class="btn-random" id="btnRandom">随机困境</button>
+          <button class="btn-primary" id="btnAnalyze" disabled>推演未来</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Results (hidden until analysis) ===== -->
+  <div id="results" class="hidden">
+
+    <!-- Empathy -->
+    <section class="section visible" style="min-height:auto;padding:60px 0">
+      <div class="container">
+        <div class="empathy-card">
+          <div class="empathy-text" id="empathyText"></div>
+          <div class="domain-tag" id="domainTag"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- River of Fate -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>命运河流</h2>
+          <p class="section-sub">三条支流，三种可能</p>
+        </div>
+        <div class="river-container">
+          <canvas class="river-canvas" id="riverCanvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three Path Cards -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>三条推演路径</h2>
+          <p class="section-sub">基于你的处境，以下是三种可能的走向</p>
+        </div>
+        <div class="paths-grid">
+          <div class="path-card optimistic" id="path-optimistic"></div>
+          <div class="path-card neutral" id="path-neutral"></div>
+          <div class="path-card pessimistic" id="path-pessimistic"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Radar Chart -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>心理画像</h2>
+          <p class="section-sub">基于你的文字分析生成</p>
+        </div>
+        <div class="radar-container">
+          <div class="radar-canvas-wrap">
+            <canvas class="radar-canvas" id="radarCanvas"></canvas>
+          </div>
+          <div class="radar-legend" id="radarLegend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Animated Stats -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>真实数据</h2>
+          <p class="section-sub">来自行为心理学和统计研究</p>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Decision Matrix -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>决策矩阵</h2>
+          <p class="section-sub">多维度评估你的选项</p>
+        </div>
+        <div class="matrix-container" id="decisionMatrix"></div>
+      </div>
+    </section>
+
+    <!-- Reading Cards -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>延伸阅读</h2>
+          <p class="section-sub">名言、历史类比与心理学概念</p>
+        </div>
+        <div class="reading-grid" id="readingCards"></div>
+      </div>
+    </section>
+
+    <!-- Psychology Insight -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>心理学洞察</h2>
+          <p class="section-sub">理解你此刻的心理机制</p>
+        </div>
+        <div class="psychology-card" id="psychologyCard"></div>
+      </div>
+    </section>
+
+    <!-- Advice -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>行动建议</h2>
+          <p class="section-sub">基于分析给出的可执行步骤</p>
+        </div>
+        <div class="advice-list" id="adviceList"></div>
+      </div>
+    </section>
+
+    <!-- Analysis Chain -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>分析推理</h2>
+          <p class="section-sub">多框架驱动的深度分析</p>
+        </div>
+        <div id="analysisContent"></div>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="section" style="min-height:auto;padding:40px 0">
+      <div class="container">
+        <div class="actions-bar">
+          <button class="btn-outline" id="btnAgain">重新推演</button>
+          <button class="btn-outline" id="btnShare">复制分享</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <div class="container">
+        <p>推演基于你的输入生成，不构成现实建议。所有数据来自公开研究，仅供参考。MiroFish v9 - 社会学驱动的叙事引擎。</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Vote Popup -->
+  <div class="vote-popup" id="votePopup">
+    <div class="vote-card">
+      <h3>你觉得最可能发生的是哪条？</h3>
+      <p class="vote-subtitle">你的选择会帮助我们改进推演模型</p>
+      <div class="vote-options">
+        <button class="vote-option" data-path="optimistic">乐观路径</button>
+        <button class="vote-option" data-path="neutral">中性路径</button>
+        <button class="vote-option" data-path="pessimistic">悲观路径</button>
+      </div>
+      <button class="vote-close">跳过</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

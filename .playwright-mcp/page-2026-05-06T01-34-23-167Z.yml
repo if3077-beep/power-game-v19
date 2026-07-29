@@ -1,0 +1,54 @@
+- generic [ref=e4]:
+  - generic [ref=e10]:
+    - generic [ref=e11]: MiroFish
+    - generic [ref=e12]: MBTI 性格推演 · 三路径模拟
+  - generic [ref=e13]:
+    - generic [ref=e14]: 💬
+    - generic [ref=e15]:
+      - generic [ref=e16]: 人生没有白走的路，每一步都算数。
+      - generic [ref=e17]: —— 史铁生
+  - generic [ref=e19]:
+    - generic [ref=e20] [cursor=pointer]:
+      - generic [ref=e21]: 💼
+      - generic [ref=e22]: 想辞职
+      - generic [ref=e23]: 骑驴找马还是裸辞
+    - generic [ref=e24] [cursor=pointer]:
+      - generic [ref=e25]: 💔
+      - generic [ref=e26]: 感情冷战
+      - generic [ref=e27]: 谁先低头
+    - generic [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]: 🚀
+      - generic [ref=e30]: 想创业
+      - generic [ref=e31]: 风险与机遇
+    - generic [ref=e32] [cursor=pointer]:
+      - generic [ref=e33]: 📚
+      - generic [ref=e34]: 考研or工作
+      - generic [ref=e35]: 人生岔路口
+    - generic [ref=e36] [cursor=pointer]:
+      - generic [ref=e37]: 📈
+      - generic [ref=e38]: 投资亏损
+      - generic [ref=e39]: 止损or坚守
+    - generic [ref=e40] [cursor=pointer]:
+      - generic [ref=e41]: 🧠
+      - generic [ref=e42]: 焦虑失眠
+      - generic [ref=e43]: 身心俱疲
+    - generic [ref=e44] [cursor=pointer]:
+      - generic [ref=e45]: 👨‍👩‍👧
+      - generic [ref=e46]: 家族生意
+      - generic [ref=e47]: 责任与自我
+    - generic [ref=e48] [cursor=pointer]:
+      - generic [ref=e49]: 📱
+      - generic [ref=e50]: 副业瓶颈
+      - generic [ref=e51]: 坚持or止损
+  - generic [ref=e52]:
+    - textbox "试着这样写：我在考虑要不要接手家族生意，但怕做不好…" [ref=e54]: 我在考虑要不要辞职，但又怕找不到更好的
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - button "😰 焦虑" [ref=e57] [cursor=pointer]
+        - button "😤 愤怒" [ref=e58] [cursor=pointer]
+        - button "😢 难过" [ref=e59] [cursor=pointer]
+        - button "😵‍💫 迷茫" [ref=e60] [cursor=pointer]
+        - button "😨 恐惧" [ref=e61] [cursor=pointer]
+        - button "🤩 期待" [ref=e62] [cursor=pointer]
+        - button "😐 平静" [ref=e63] [cursor=pointer]
+      - button "推演 →" [ref=e64] [cursor=pointer]

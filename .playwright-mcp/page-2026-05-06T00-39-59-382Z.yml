@@ -1,0 +1,28 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - generic:
+      - generic:
+        - generic: 印
+      - generic:
+        - button "重新来过"
+        - button "保存为图片"
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]: 白宫的一天
+      - generic [ref=e30]: 1 / 8
+      - button "♪" [ref=e31] [cursor=pointer]
+      - button "返回首页" [ref=e32] [cursor=pointer]
+    - generic [ref=e33]:
+      - generic [ref=e34]: 消息渠道
+      - generic [ref=e41]: 内线畅通
+    - generic [ref=e44]:
+      - generic [ref=e45]: 第一章 · 清晨 · 总统每日简报
+      - generic [ref=e46]: 清
+      - generic [ref=e49]:
+        - generic [ref=e50]: 选这个？《乡土中国》：面子是社会交往中最微妙的武器。在西方，面子叫 approval rating。
+        - generic [ref=e51]: 选这个？《权力的道路》：真正的权力博弈发生在公众视线之外。
+        - generic [ref=e52]: 选这个？《置身事内》：领导者最重要的能力不是决策，是让制度运转。
+    - generic [ref=e53]:
+      - generic [ref=e54]: 人情债记录本
+      - generic [ref=e55]: 共 0 笔人情债
+    - generic [ref=e56] [cursor=pointer]: 卷 轴

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NarrativeCore 引擎演示</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#e8e4de;font-family:'Inter','Noto Serif SC',sans-serif;overflow-x:hidden;line-height:1.8;}
+canvas#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+#app{position:relative;z-index:2;min-height:100vh;}
+.audio-btn{position:fixed;top:1rem;right:1rem;z-index:100;padding:0.4rem 0.8rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:#6b6560;font-size:0.7rem;cursor:pointer;transition:all 0.3s;font-family:'Inter',sans-serif;}
+.audio-btn:hover{color:#e8e4de;border-color:#c9a96e;}
+.audio-btn.on{color:#c9a96e;border-color:#c9a96e;}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<button class="audio-btn" id="audioBtn" onclick="toggleAudio()">♪ 音效</button>
+<div id="app"></div>
+<script src="narrative-core.js"></script>
+<script>
+// ─── 演示篇章数据 ───
+const demoChapter = {
+  id: 'demo',
+  title: '引擎演示 — 一场饭局',
+  bgmStyle: 'tension',
+  stats: [
+    { key: 'influence', label: '影响力', value: 50 },
+    { key: 'pressure',  label: '压力',   value: 30 },
+  ],
+  scenes: [
+    {
+      chapter: '第一幕',
+      title: '饭局邀约',
+      text: '你刚升任部门主管。周五晚上，收到两条微信：\n\n一条来自你的老领导——"小张，晚上出来坐坐，有几个老朋友想认识你。"\n\n另一条来自你的妻子——"今天是你女儿生日，你说好回来吃饭的。"\n\n两条消息之间隔了三分钟。你盯着屏幕，手指悬在键盘上方。',
+      narrator: '「人情不单是说家乡里面的成员彼此之间有一种特定的情感，而是其中包含着彼此间的资源交换。」——翟学伟',
+      choices: [
+        {
+          text: '赴约——老领导的面子不能不给',
+          hint: '升职之后，你需要这张关系网。',
+          debt: '你欠女儿一个生日承诺',
+          debtType: 'favor',
+          bookQuote: '《乡土中国》：在中国社会，拒绝一个饭局邀请就是拒绝一段关系。',
+          consequence: '饭局上你认识了三个关键人物。但女儿吹蜡烛时打来的电话，你按掉了。妻子没说什么，但你知道她记住了。',
+          effects: { influence: 15, pressure: 10 },
+          socialContext: { relationshipLayer: 2, relationType: 1, role: 'requester', debtType: 'favor', influenceContext: { gaveFirst: true, liked: true } }
+        },
+        {
+          text: '回家——女儿只有一个',
+          hint: '但老领导会觉得你不识抬举。',
+          debt: '你拒绝了老领导的邀约',
+          debtType: 'silence',
+          bookQuote: '《人情与面子》：拒绝给予特殊帮助，势必会影响彼此关系，甚至破坏其人缘。',
+          consequence: '女儿很开心。但第二天，老领导在群里发了饭局合照——你不在其中。你的继任者在照片里笑得很灿烂。',
+          effects: { influence: -10, pressure: -5 },
+          socialContext: { relationshipLayer: 2, relationType: 1, role: 'requester', goingAgainst: true, groupPressure: true }
+        },
+        {
+          text: '两边都应付——先去饭局露个面，再赶回家',
+          hint: '你以为两全其美，其实两边都半吊子。',
+          debt: '你在饭局心不在焉，老领导看在眼里',
+          debtType: 'face',
+          bookQuote: '《人情、面子与权力的再生产》：面子运作的关键在于"做足"——半吊子比不做更伤面子。',
+          consequence: '你在饭局待了40分钟就走了。老领导笑着说"年轻人顾家"，但语气不对。回到家女儿已经睡了。你两头都没落着好。',
+          effects: { influence: 5, pressure: 15 },
+          socialContext: { relationshipLayer: 2, relationType: 1, role: 'requester', faceContext: 'half-hearted' }
+        }
+      ]
+    },
+    {
+      chapter: '第二幕',
+      title: '饭局之后',
+      text: '周一上班。老领导的秘书来找你："领导说上次没聊够，这周三晚上再聚一次。"\n\n你翻开日历——周三晚上是你承诺陪女儿参加学校演出的日子。\n\n秘书看你犹豫，补了一句："这次是王总做东，他点名要见你。"',
+      narrator: '「我们所有人都会一次次地被愚弄，因为影响力的基本特征具有极大的愚弄性。」——Cialdini《影响力》',
+      choices: [
+        {
+          text: '答应——王总点名要见，不去说不过去',
+          hint: '权威+稀缺+承诺一致，三重原则同时作用。',
+          debt: '你再次对女儿失约',
+          debtType: 'favor',
+          bookQuote: '《影响力》：权威原则让你以为"必须去"，其实你只是被操纵了。',
+          consequence: '你成了王总和老领导圈子里的"自己人"。但女儿的班主任发来照片——演出时她一直在往观众席看，找你的位置。',
+          effects: { influence: 20, pressure: 15 },
+          socialContext: { relationshipLayer: 3, relationType: 1, role: 'requester', debtType: 'favor', influenceContext: { hasAuthority: true, rare: true, commitment: true } }
+        },
+        {
+          text: '拒绝——这次真的不行',
+          hint: '你已经拒绝过一次了，再来一次关系就断了。',
+          debt: '你连续两次拒绝老领导',
+          debtType: 'silence',
+          bookQuote: '《人情与面子》：在混合性关系中，反复拒绝意味着你在主动退出这段关系。',
+          consequence: '秘书的笑容僵了一秒。下周，你的一个关键审批被"流程需要再走走"。你知道是谁的意思。但女儿演出时看到你在台下，笑得特别开心。',
+          effects: { influence: -15, pressure: -10 },
+          socialContext: { relationshipLayer: 3, relationType: 1, goingAgainst: true, groupPressure: true }
+        },
+        {
+          text: '找老领导私下说——"领导，周三真有事，改天我做东"',
+          hint: '把拒绝包装成主动邀约——面子给到了，人情债也转移了。',
+          debt: '你欠老领导一顿饭',
+          debtType: 'face',
+          bookQuote: '《乡土中国》：人情交换的目的不完全是因为需要帮助，而是维系彼此关系的方式。',
+          consequence: '老领导拍了拍你的肩膀："行，你定时间。"你既保住了女儿的演出，也保住了关系——但你欠下了一顿必须还的人情饭。',
+          effects: { influence: 5, pressure: 5 },
+          socialContext: { relationshipLayer: 2, relationType: 1, role: 'requester', debtType: 'face', influenceContext: { reciprocity: true } }
+        }
+      ]
+    }
+  ],
+  endings: [
+    {
+      id: 'networker',
+      title: '弄潮儿',
+      subtitle: '你融入了圈子，但圈外的人在离你远去',
+      icon: '🌊',
+      condition: ({ stats, dominant }) => stats.influence >= 55 && dominant.type === 'favor',
+      verdict: '你学会了权力的规则——每一次饭局都是一笔投资，每一次缺席都是一笔亏损。你的人脉越来越广，但你和家人的晚餐越来越少。',
+      analysis: '黄光国的"人情与面子"模型：你在混合性关系中大量使用人情法则，获得了资源分配的优势，但也让自己陷入了人情债务的循环。翟学伟指出，这种交换最终会让"关系"取代"制度"成为你获取资源的主要渠道——你已经无法脱身了。',
+      atmosphere: 'confetti'
+    },
+    {
+      id: 'exile',
+      title: '孤岛',
+      subtitle: '你守住了底线，但圈子不再有你的位置',
+      icon: '🏝️',
+      condition: ({ stats, dominant }) => stats.influence <= 40 && dominant.type === 'silence',
+      verdict: '你拒绝了饭局，保住了家庭，但你的审批越来越慢，机会越来越少。你发现：在人情社会里，"不合群"的代价比"犯错"更高。',
+      analysis: 'Asch从众实验揭示：即使正确答案显而易见，75%的人仍会选择从众。你选择了不从众——这需要极大的心理能量。但费孝通的差序格局告诉我们：在中国社会，被圈子排斥意味着失去"关系"这个最重要的资源渠道。',
+      atmosphere: 'dark'
+    },
+    {
+      id: 'balancer',
+      title: '走钢丝的人',
+      subtitle: '你在人情和原则之间找到了平衡点',
+      icon: '⚖️',
+      condition: ({ stats }) => stats.influence >= 40 && stats.influence <= 55 && stats.pressure <= 50,
+      verdict: '你没有完全融入圈子，也没有完全被排斥。你学会了在拒绝时给面子，在答应时留余地。这不是最优解，但这是最"活"的解。',
+      analysis: 'Cialdini的互惠原则：你用"我做东"替代了"我不去"，把拒绝转化成了新的互惠承诺。这是中国文化中"情面"的精髓——不是非此即彼，而是在关系的缝隙中找到第三条路。',
+      atmosphere: 'confetti'
+    }
+  ]
+};
+
+// ─── 初始化引擎 ───
+const core = new NarrativeCore({ container: '#app', prefix: 'demo_' });
+core.loadChapter(demoChapter);
+core.start();
+
+// ─── 音频切换 ───
+function toggleAudio() {
+  const enabled = core.audio.toggle();
+  document.getElementById('audioBtn').classList.toggle('on', enabled);
+  if (enabled) core.audio.startBGM(demoChapter.bgmStyle);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnalysisEngine - 框架驱动的人性分析引擎</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+:root {
+  --bg:#0a0a0a; --text:#e8e4de; --muted:#6b6560;
+  --accent:#c9a96e; --card-bg:rgba(255,255,255,0.03);
+  --card-border:rgba(255,255,255,0.06); --glass:rgba(255,255,255,0.04);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Inter','Noto Serif SC',sans-serif;
+  line-height:1.8; -webkit-font-smoothing:antialiased;
+  padding:2rem; max-width:900px; margin:0 auto;
+}
+
+h1 {
+  font-family:'Noto Serif SC',serif; font-size:2rem; font-weight:700;
+  margin-bottom:0.5rem;
+  background:linear-gradient(135deg,var(--text),var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+
+.subtitle { color:var(--muted); margin-bottom:2rem; font-size:0.85rem; }
+
+.demo-section {
+  margin-bottom:3rem; padding:1.5rem;
+  background:var(--card-bg); border:1px solid var(--card-border);
+}
+
+.demo-section h2 {
+  font-family:'Noto Serif SC',serif; font-size:1.1rem;
+  color:var(--accent); margin-bottom:1rem;
+}
+
+/* 场景选择器 */
+.scenario-selector {
+  display:flex; gap:0.8rem; flex-wrap:wrap; margin-bottom:1.5rem;
+}
+
+.scenario-btn {
+  padding:0.6rem 1.2rem; background:var(--glass);
+  border:1px solid var(--card-border); color:var(--text);
+  font-family:'Noto Serif SC',serif; font-size:0.85rem;
+  cursor:pointer; transition:all 0.3s;
+}
+
+.scenario-btn:hover, .scenario-btn.active {
+  background:rgba(201,169,110,0.1); border-color:var(--accent);
+}
+
+/* 输入区 */
+.input-area {
+  width:100%; min-height:80px; padding:1rem;
+  background:rgba(255,255,255,0.02); border:1px solid var(--card-border);
+  color:var(--text); font-family:'Noto Serif SC',serif;
+  font-size:0.9rem; line-height:1.8; resize:vertical;
+  margin-bottom:1rem;
+}
+
+.input-area:focus { outline:none; border-color:var(--accent); }
+
+.analyze-btn {
+  padding:0.8rem 2rem; background:transparent;
+  border:1px solid var(--accent); color:var(--text);
+  font-family:'Noto Serif SC',serif; font-size:0.9rem;
+  cursor:pointer; transition:all 0.3s;
+}
+
+.analyze-btn:hover { background:rgba(201,169,110,0.1); }
+
+/* 输出区 */
+#analysis-output { margin-top:2rem; }
+
+/* 代码示例 */
+.code-block {
+  background:rgba(255,255,255,0.03); border:1px solid var(--card-border);
+  padding:1rem; margin:1rem 0; font-family:'Fira Code',monospace;
+  font-size:0.75rem; line-height:1.6; overflow-x:auto;
+  color:var(--muted); white-space:pre; tab-size:2;
+}
+
+.code-block .kw { color:#c45c4a; }
+.code-block .str { color:#6b8f71; }
+.code-block .comment { color:#4a4540; }
+
+/* 框架说明 */
+.framework-list {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:0.8rem; margin-top:1rem;
+}
+
+.framework-item {
+  padding:0.8rem; background:var(--glass); border:1px solid var(--card-border);
+}
+
+.framework-item .fi-icon { font-size:1.2rem; margin-bottom:0.3rem; }
+.framework-item .fi-name { font-size:0.8rem; color:var(--accent); margin-bottom:0.2rem; }
+.framework-item .fi-desc { font-size:0.7rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>AnalysisEngine</h1>
+<p class="subtitle">框架驱动的人性/社会分析引擎 — 用分析框架组合生成洞察，而非模板填充</p>
+
+<!-- ====== 框架总览 ====== -->
+<div class="demo-section">
+  <h2>内置分析框架</h2>
+  <div class="framework-list">
+    <div class="framework-item"><div class="fi-icon">⚖️</div><div class="fi-name">权力动力学</div><div class="fi-desc">权力结构、资源控制、影响力流向</div></div>
+    <div class="framework-item"><div class="fi-icon">👥</div><div class="fi-name">群体心理学</div><div class="fi-desc">从众压力、社会认同、旁观者效应</div></div>
+    <div class="framework-item"><div class="fi-icon">🎭</div><div class="fi-name">道德困境</div><div class="fi-desc">功利主义 vs 义务论 vs 美德伦理</div></div>
+    <div class="framework-item"><div class="fi-icon">🎲</div><div class="fi-name">博弈论</div><div class="fi-desc">囚徒困境、胆小鬼博弈、最后通牒</div></div>
+    <div class="framework-item"><div class="fi-icon">🔍</div><div class="fi-name">信息不对称</div><div class="fi-desc">信息差、逆向选择、信号传递</div></div>
+    <div class="framework-item"><div class="fi-icon">🎪</div><div class="fi-name">情感操控</div><div class="fi-desc">煤气灯、愧疚诱导、冷暴力识别</div></div>
+    <div class="framework-item"><div class="fi-icon">🔄</div><div class="fi-name">社会交换</div><div class="fi-desc">人情债、互惠规范、关系投资</div></div>
+    <div class="framework-item"><div class="fi-icon">🧠</div><div class="fi-name">认知偏差</div><div class="fi-desc">沉没成本、确认偏误、损失厌恶</div></div>
+  </div>
+</div>
+
+<!-- ====== 交互演示 ====== -->
+<div class="demo-section">
+  <h2>实时演示</h2>
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">选择一个场景，或输入你自己的情境：</p>
+
+  <div class="scenario-selector" id="scenarioSelector">
+    <button class="scenario-btn active" data-idx="0">同事背后说我坏话</button>
+    <button class="scenario-btn" data-idx="1">领导让我背锅</button>
+    <button class="scenario-btn" data-idx="2">朋友借钱不还</button>
+    <button class="scenario-btn" data-idx="3">伴侣冷暴力</button>
+  </div>
+
+  <textarea class="input-area" id="scenarioInput" placeholder="输入你的情境描述...">你发现同事在背后跟领导说你工作不认真，但你并没有。你偶然从另一个同事口中得知此事。</textarea>
+
+  <button class="analyze-btn" onclick="runAnalysis()">分析这个情境</button>
+
+  <div id="analysis-output"></div>
+</div>
+
+<!-- ====== 用法示例 ====== -->
+<div class="demo-section">
+  <h2>在你的网页中使用</h2>
+
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">1. 引入两个文件：</p>
+  <div class="code-block"><span class="kw">&lt;script</span> src=<span class="str">"analysis-engine.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
+<span class="kw">&lt;script</span> src=<span class="str">"analysis-renderer.js"</span><span class="kw">&gt;&lt;/script&gt;</span></div>
+
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">2. 一行代码完成分析+渲染：</p>
+  <div class="code-block"><span class="comment">// 最简用法</span>
+quickAnalyze(<span class="str">'#output'</span>, {
+  scenario: <span class="str">'你的情境描述'</span>,
+  context: { role: <span class="str">'职场新人'</span>, stakes: <span class="str">'中等'</span> },
+  options: [
+    { id: <span class="str">'a'</span>, text: <span class="str">'当面质问'</span>,  tags: [<span class="str">'direct'</span>, <span class="str">'confrontational'</span>] },
+    { id: <span class="str">'b'</span>, text: <span class="str">'装作不知道'</span>, tags: [<span class="str">'passive'</span>, <span class="str">'avoidant'</span>] },
+    { id: <span class="str">'c'</span>, text: <span class="str">'找领导谈'</span>,  tags: [<span class="str">'hierarchical'</span>] },
+  ]
+});</div>
+
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">3. 高级用法 — 自定义框架组合：</p>
+  <div class="code-block"><span class="kw">const</span> engine = <span class="kw">new</span> AnalysisEngine({
+  frameworks: [<span class="str">'gameTheory'</span>, <span class="str">'powerDynamics'</span>, <span class="str">'moralDilemma'</span>],
+  depth: <span class="str">'deep'</span>
+});
+
+<span class="kw">const</span> result = engine.analyze(input);
+
+<span class="comment">// result 包含：</span>
+<span class="comment">// .chainOfThought  — 链式推理步骤</span>
+<span class="comment">// .frameworks      — 各框架的分析结果</span>
+<span class="comment">// .options         — 带评分的选项排序</span>
+<span class="comment">// .tensions        — 核心张力（矛盾点）</span>
+<span class="comment">// .summary         — 总结判断</span></div>
+
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">4. 在文字游戏中使用 — 动态分析玩家选择：</p>
+  <div class="code-block"><span class="comment">// 玩家做出选择后，分析其后果</span>
+<span class="kw">function</span> onPlayerChoice(choice) {
+  <span class="kw">const</span> result = engine.analyze({
+    scenario: currentScene.description,
+    context: {
+      role: player.identity,
+      stakes: currentScene.stakes,
+      trust_level: player.trustScore,
+      history_length: player.choices.length,
+    },
+    options: currentScene.options.map(o => ({
+      id: o.id,
+      text: o.text,
+      tags: o.analysisTags,  <span class="comment">// 每个选项预设的分析标签</span>
+    }))
+  });
+
+  <span class="comment">// 渲染分析结果到场景面板</span>
+  renderer.render(result);
+
+  <span class="comment">// 或者只取洞察文本，嵌入到叙事中</span>
+  <span class="kw">const</span> topInsight = result.insights
+    .filter(i => i.severity === <span class="str">'high'</span>)[0];
+  appendNarrative(topInsight.text);
+}</div>
+</div>
+
+<!-- ====== 可用的选项标签 ====== -->
+<div class="demo-section">
+  <h2>选项标签参考</h2>
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.8rem;">给选项打标签，引擎会根据标签在各维度上评分：</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;font-size:0.75rem;">
+    <div><span style="color:var(--accent)">权力:</span> direct, confrontational, passive, avoidant, coalition, alliance, information, leverage, hierarchical, escalation</div>
+    <div><span style="color:var(--accent)">群体:</span> public, visible, conformist, go_along, whistle, dissent, private, discrete</div>
+    <div><span style="color:var(--accent)">道德:</span> ethical, principled, pragmatic, practical, selfish, exploit, sacrifice, altruistic, deceptive, manipulative</div>
+    <div><span style="color:var(--accent)">博弈:</span> cooperate, collaborate, defect, betray, signal, commit, retaliate, punish, negotiate, mediate</div>
+    <div><span style="color:var(--accent)">信息:</span> information, research, reveal, transparency, conceal, secret, demonstrate</div>
+    <div><span style="color:var(--accent)">反操控:</span> boundary, assertive, seek_help, support, comply, submit, manipulate_back, document, evidence</div>
+    <div><span style="color:var(--accent)">交换:</span> reciprocate, return_favor, invest, build_trust, withdraw, exit, clarify</div>
+    <div><span style="color:var(--accent)">认知:</span> evidence, data, reflect, pause, impulsive, emotional, perspective, reframe, consult, outside_view</div>
+  </div>
+</div>
+
+<script src="analysis-engine.js"></script>
+<script src="analysis-renderer.js"></script>
+<script>
+// ====== 预设场景 ======
+const scenarios = [
+  {
+    text: '你发现同事在背后跟领导说你工作不认真，但你并没有。你偶然从另一个同事口中得知此事。',
+    context: { role: '职场普通员工', stakes: '中等', relationship: '职场', trust_level: 'low', judging_others: true },
+    options: [
+      { id: 'a', text: '直接找那个同事当面质问', tags: ['direct', 'confrontational', 'public'] },
+      { id: 'b', text: '装作不知道，用业绩证明自己', tags: ['passive', 'avoidant', 'pragmatic'] },
+      { id: 'c', text: '找领导主动沟通工作情况', tags: ['hierarchical', 'signal', 'demonstrate'] },
+      { id: 'd', text: '也跟其他同事说这个人的坏话', tags: ['defect', 'retaliate', 'manipulative'] },
+    ]
+  },
+  {
+    text: '项目出了问题，领导在会议上暗示是你的责任，但实际上是他自己决策失误。其他同事都知道真相但没人说话。',
+    context: { role: '中层员工', stakes: '高', relationship: '职场', trust_level: 'low', power_imbalance: true, observers: 5 },
+    options: [
+      { id: 'a', text: '当场澄清事实，拿出证据', tags: ['direct', 'confrontational', 'evidence', 'whistle'] },
+      { id: 'b', text: '会后私下找领导谈', tags: ['private', 'negotiate', 'discrete'] },
+      { id: 'c', text: '忍了，但开始记录所有决策过程', tags: ['document', 'evidence', 'strategic'] },
+      { id: 'd', text: '联合其他知情同事一起反映', tags: ['coalition', 'alliance', 'escalation'] },
+    ]
+  },
+  {
+    text: '朋友半年前借了你5000块钱，说好一个月还。现在半年过去了，他朋友圈天天晒吃喝玩乐，但从来不提还钱的事。',
+    context: { role: '债权人', stakes: '中等', relationship: '朋友', trust_level: 'low', history_length: 6 },
+    options: [
+      { id: 'a', text: '直接开口要钱', tags: ['direct', 'assertive', 'boundary'] },
+      { id: 'b', text: '发个微信暗示一下', tags: ['signal', 'discrete', 'private'] },
+      { id: 'c', text: '算了，当花钱买了个教训', tags: ['withdraw', 'passive'] },
+      { id: 'd', text: '跟共同朋友吐槽，让他知道你的态度', tags: ['public', 'signal', 'manipulate_back'] },
+    ]
+  },
+  {
+    text: '你和伴侣吵架后，对方已经三天没跟你说话了。你发消息不回，打电话不接，但对方朋友圈照常更新。',
+    context: { role: '伴侣', stakes: '高', relationship: '亲密关系', trust_level: 'medium', standoff: true },
+    options: [
+      { id: 'a', text: '继续发消息，表达你的关心', tags: ['cooperate', 'invest', 'emotional'] },
+      { id: 'b', text: '也不理对方，看谁先忍不住', tags: ['retaliate', 'defect', 'signal'] },
+      { id: 'c', text: '给对方空间，等ta冷静后再谈', tags: ['pause', 'reflect', 'strategic'] },
+      { id: 'd', text: '直接去对方家里当面谈', tags: ['direct', 'confrontational', 'commit'] },
+    ]
+  },
+];
+
+// ====== 渲染器实例 ======
+const renderer = new AnalysisRenderer({ container: '#analysis-output' });
+const engine = new AnalysisEngine();
+
+// ====== 场景切换 ======
+document.querySelectorAll('.scenario-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const idx = parseInt(btn.dataset.idx);
+    document.getElementById('scenarioInput').value = scenarios[idx].text;
+  });
+});
+
+// ====== 运行分析 ======
+function runAnalysis() {
+  const activeBtn = document.querySelector('.scenario-btn.active');
+  const idx = activeBtn ? parseInt(activeBtn.dataset.idx) : 0;
+  const scenario = scenarios[idx];
+
+  // 允许用户修改文本
+  const customText = document.getElementById('scenarioInput').value.trim();
+  if (customText !== scenario.text) {
+    // 用户自定义输入，用默认选项
+    const result = engine.analyze({
+      scenario: customText,
+      context: { role: '当事人', stakes: '中等' },
+      options: [
+        { id: 'a', text: '正面对抗', tags: ['direct', 'confrontational'] },
+        { id: 'b', text: '隐忍观察', tags: ['passive', 'strategic', 'document'] },
+        { id: 'c', text: '寻求帮助', tags: ['coalition', 'seek_help', 'support'] },
+        { id: 'd', text: '以牙还牙', tags: ['retaliate', 'defect', 'manipulate_back'] },
+      ]
+    });
+    renderer.render(result);
+  } else {
+    const result = engine.analyze(scenario);
+    renderer.render(result);
+  }
+}
+
+// 初始运行
+runAnalysis();
+</script>
+
+</body>
+</html>
