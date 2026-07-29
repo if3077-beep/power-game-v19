@@ -602,7 +602,7 @@ function stopBGM() { audioEngine.stopBGM(); }
 // --- 游戏状态 ---
 // V14.6: channelEventCount 限制每局最多触发2次渠道事件
 let state = { scenario: null, currentScene: 0, debts: [], channels: 5, choices: [], history: [], usedEvents: [], channelEventCount: 0, fragments: 0, fragmentsSeen: [] };
-let unlockedEndings = JSON.parse(localStorage.getItem('unlockedEndings') || '{}');
+let unlockedEndings = (function(){ try { return JSON.parse(localStorage.getItem('unlockedEndings') || '{}'); } catch(e) { return {}; } })();
 
 // --- 屏幕切换 ---
 function showScreen(id) {
@@ -876,7 +876,7 @@ document.addEventListener('keydown', e => {
 // --- V10: Landing 页交互音效 ---
 document.addEventListener('DOMContentLoaded', () => {
   // V12.1: 检查AI道路是否已解锁
-  if (localStorage.getItem('aiUnlocked')) {
+  if (typeof safeStorage !== 'undefined' && safeStorage.get('aiUnlocked')) {
     const aiCard = document.getElementById('aiCard');
     if (aiCard) aiCard.style.display = '';
   }

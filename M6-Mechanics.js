@@ -2,6 +2,30 @@
 //  M6: 游戏机制（人情债/消息渠道/结局/奏折/身份卡/图鉴）
 // ============================================================
 
+// V18.1: 安全 localStorage 封装 — 防止 quota 超限/隐私模式崩溃
+var safeStorage = {
+  get(key, fallback) {
+    try { const v = localStorage.getItem(key); return v !== null ? v : fallback; }
+    catch(e) { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, value); return true; }
+    catch(e) { console.warn('[safeStorage] 写入失败:', key, e.message); return false; }
+  },
+  remove(key) {
+    try { localStorage.removeItem(key); return true; }
+    catch(e) { return false; }
+  },
+  getJSON(key, fallback) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e) { return fallback; }
+  },
+  setJSON(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+    catch(e) { console.warn('[safeStorage] JSON写入失败:', key, e.message); return false; }
+  }
+};
+
 const scenarios = { whitehouse: whitehouseData, ming: mingData, ai: aiData, africa: africaData, cyber: cyberData, korea: koreaData, chaos: chaosData, xianjian: xianjianData };
 
 // V18: evo-lite 演化引擎实例 — 蒸馏自 evo-engine, 偏好驱动事件选择 + 文案突变
@@ -25,7 +49,7 @@ let pendingUnlock = null; // 本局待解锁的隐藏道路
 
 function checkHiddenUnlock(scenarioKey) {
   for (const [road, cfg] of Object.entries(hiddenRoads)) {
-    if (cfg.triggerScenario === scenarioKey && hasFlag(cfg.triggerFlag) && !localStorage.getItem(cfg.unlockKey)) {
+    if (cfg.triggerScenario === scenarioKey && hasFlag(cfg.triggerFlag) && !safeStorage.get(cfg.unlockKey)) {
       pendingUnlock = road;
       return road;
     }
@@ -36,7 +60,7 @@ function checkHiddenUnlock(scenarioKey) {
 function showUnlockNotification(road) {
   const cfg = hiddenRoads[road];
   const sc = scenarios[road];
-  localStorage.setItem(cfg.unlockKey, 'true');
+  safeStorage.set(cfg.unlockKey, 'true');
   if (road === 'africa' || road === 'cyber' || road === 'korea') {
     const aiCard = document.getElementById('aiCard');
     if (aiCard) aiCard.style.display = '';
@@ -1320,8 +1344,8 @@ function showIntro(scenarioKey) {
 // V20 R7: 校准环节触发逻辑改造 — 仅在3的倍数游玩次数,且有15%概率出现
 function showCalibrate(scenarioKey) {
   // 累计游玩次数(用户点击"踏入命运"视为开始一次游玩)
-  const playCount = parseInt(localStorage.getItem('playCount') || '0', 10) + 1;
-  localStorage.setItem('playCount', String(playCount));
+  const playCount = parseInt(safeStorage.get('playCount', '0'), 10) + 1;
+  safeStorage.set('playCount', String(playCount));
   // 仅在3的倍数游玩次数时,15%概率出现校准环节
   const shouldShow = (playCount % 3 === 0) && (Math.random() < 0.15);
   if (!shouldShow) {
@@ -4283,24 +4307,24 @@ function showEnding() {
   if (!unlockedEndings[state.scenario]) unlockedEndings[state.scenario] = [];
   if (!unlockedEndings[state.scenario].includes(ending.id)) {
     unlockedEndings[state.scenario].push(ending.id);
-    localStorage.setItem('unlockedEndings', JSON.stringify(unlockedEndings));
+    safeStorage.setJSON('unlockedEndings', unlockedEndings);
   }
 
   // V12.1: 首次通关任意道路 → 解锁AI共生时代
   const totalEndings = Object.values(unlockedEndings).reduce((sum, arr) => sum + arr.length, 0);
-  if (totalEndings >= 1 && !localStorage.getItem('aiUnlocked')) {
-    localStorage.setItem('aiUnlocked', 'true');
+  if (totalEndings >= 1 && !safeStorage.get('aiUnlocked')) {
+    safeStorage.set('aiUnlocked', 'true');
     const aiCard = document.getElementById('aiCard');
     if (aiCard) aiCard.style.display = '';
   }
 
   // V20 R13: 保底解锁 — 累计通关3局后自动解锁所有隐藏道路
-  const gamesCompleted = parseInt(localStorage.getItem('gamesCompleted') || '0', 10) + 1;
-  localStorage.setItem('gamesCompleted', String(gamesCompleted));
+  const gamesCompleted = parseInt(safeStorage.get('gamesCompleted', '0'), 10) + 1;
+  safeStorage.set('gamesCompleted', String(gamesCompleted));
   if (gamesCompleted >= 3) {
     Object.values(hiddenRoads).forEach(cfg => {
-      if (!localStorage.getItem(cfg.unlockKey)) {
-        localStorage.setItem(cfg.unlockKey, 'true');
+      if (!safeStorage.get(cfg.unlockKey)) {
+        safeStorage.set(cfg.unlockKey, 'true');
       }
     });
     // 刷新隐藏卡片显示
@@ -4526,10 +4550,10 @@ function renderGalleryContent(tab) {
   const screen = document.getElementById('gallery-screen');
   const sc = scenarios[tab];
   const unlocked = unlockedEndings[tab] || [];
-  const aiUnlocked = !!localStorage.getItem('aiUnlocked');
-  const africaUnlocked = !!localStorage.getItem('africaUnlocked');
-  const cyberUnlocked = !!localStorage.getItem('cyberUnlocked');
-  const koreaUnlocked = !!localStorage.getItem('koreaUnlocked');
+  const aiUnlocked = !!safeStorage.get('aiUnlocked');
+  const africaUnlocked = !!safeStorage.get('africaUnlocked');
+  const cyberUnlocked = !!safeStorage.get('cyberUnlocked');
+  const koreaUnlocked = !!safeStorage.get('koreaUnlocked');
   const totalUnlocked = Object.values(unlockedEndings).reduce((s, a) => s + a.length, 0);
   const totalEndings = Object.values(scenarios).reduce((s, sc) => s + sc.endings.length, 0);
   const pct = totalEndings > 0 ? Math.round(totalUnlocked / totalEndings * 100) : 0;
@@ -4643,13 +4667,13 @@ function showEndingDetail(endingId, scenarioKey) {
 // V14.1: 全解锁选项
 function unlockAllEndings() {
   if (!confirm('解锁前三个道路的全部结局？（隐藏道路需自行探索）')) return;
-  ['ai'].forEach(road => localStorage.setItem(road + 'Unlocked', 'true'));
+  ['ai'].forEach(road => safeStorage.set(road + 'Unlocked', 'true'));
   const allEndings = {};
   Object.entries(scenarios).forEach(([key, sc]) => {
     if (!['whitehouse', 'ming', 'ai'].includes(key)) return;
     allEndings[key] = sc.endings.map(e => e.id);
   });
-  localStorage.setItem('unlockedEndings', JSON.stringify(allEndings));
+  safeStorage.setJSON('unlockedEndings', allEndings);
   loadUnlockedEndings();
   renderGalleryContent('whitehouse');
   triggerChaosUnlockAnimation();
@@ -4685,7 +4709,7 @@ function triggerChaosUnlockAnimation() {
     setTimeout(() => { msg.style.opacity = '0'; msg.style.transform = 'translate(-50%,-50%) scale(1.3)'; setTimeout(() => msg.remove(), 1000); }, 3000);
   }, 800);
   setTimeout(() => {
-    localStorage.setItem('chaosUnlocked', 'true');
+    safeStorage.set('chaosUnlocked', 'true');
     flash.style.opacity = '0';
     // V14.6: 粒子渐隐 — 修复生硬消失
     particles.style.transition = 'opacity 1.2s ease-out';
@@ -4701,7 +4725,7 @@ function triggerChaosUnlockAnimation() {
 }
 function loadUnlockedEndings() {
   try {
-    const saved = JSON.parse(localStorage.getItem('unlockedEndings') || '{}');
+    const saved = safeStorage.getJSON('unlockedEndings', {});
     Object.assign(unlockedEndings, saved);
   } catch (e) { /* ignore corrupt data */ }
 }
@@ -4814,7 +4838,7 @@ function initLanding() {
 function saveSession() {
   try {
     if (!state || !state.scenario) return;
-    localStorage.setItem('pg_session', JSON.stringify({
+    safeStorage.setJSON('pg_session', {
       scenario: state.scenario,
       currentScene: state.currentScene,
       channels: state.channels,
@@ -4825,15 +4849,15 @@ function saveSession() {
       intensity: state.intensity,
       isHidden: state.isHidden,
       savedAt: Date.now(),
-    }));
+    });
   } catch(e) {}
 }
 function clearSession() {
-  try { localStorage.removeItem('pg_session'); } catch(e) {}
+  try { safeStorage.remove('pg_session'); } catch(e) {}
 }
 function loadSession() {
   try {
-    const s = JSON.parse(localStorage.getItem('pg_session') || 'null');
+    const s = safeStorage.getJSON('pg_session', null);
     if (!s || !s.scenario) return null;
     // 超过 24 小时的会话视为过期
     if (Date.now() - (s.savedAt || 0) > 86400000) { clearSession(); return null; }

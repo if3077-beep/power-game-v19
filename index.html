@@ -11,6 +11,14 @@
 </head>
 <body>
 
+<div id="appLoader" style="position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1612,#0a0806);font-family:serif;transition:opacity 0.6s ease;">
+  <div style="text-align:center;">
+    <div style="width:36px;height:36px;border:2px solid rgba(201,169,110,0.2);border-top-color:#c9a96e;border-radius:50%;margin:0 auto 1.5rem;animation:loaderSpin 0.8s linear infinite;"></div>
+    <div style="font-size:0.85rem;color:#8a7a5a;letter-spacing:0.15em;">权力的游戏</div>
+    <div style="font-size:0.65rem;color:#5a4a3a;margin-top:0.4rem;">加载中...</div>
+  </div>
+</div>
+<style>@keyframes loaderSpin{to{transform:rotate(360deg)}}</style>
 <canvas id="particles"></canvas>
 <div id="cursorGlow"></div>
 <div class="fate-river-wrap" id="fateRiverWrap"><canvas id="fateRiverCanvas"></canvas></div>
@@ -191,6 +199,9 @@
   window.addEventListener('DOMContentLoaded', function(){
     setTimeout(function(){
       var failed = window.__moduleCheck();
+      // 先隐藏加载指示器
+      var loader = document.getElementById('appLoader');
+      if (loader) { loader.style.opacity = '0'; setTimeout(function(){ if(loader.parentNode) loader.parentNode.removeChild(loader); }, 600); }
       if (failed.length > 0) {
         console.error('[ModuleGuard] 加载失败的模块:', failed);
         window.__showModuleError(failed);
@@ -237,41 +248,43 @@
 <script>
 // V14.3: 隐藏道路解锁状态 — 未解锁时显示锁定占位卡
 (function() {
-  const lockInfo = {
+  var lockInfo = {
     ai: { hint: '🔒 通关「白宫」或「大明」后解锁', fullText: '共生时代 · 2036年。解锁后：在人类与AI之间搭建信任的桥梁。' },
     africa: { hint: '🔒 在白宫道路做出「非我族类」的选择', fullText: '非洲之心 · 异星大地。解锁后：成为人类与兽群的双语使者。' },
     cyber: { hint: '🔒 在AI道路见证一次「觉醒」事件', fullText: '3077 · 赛博贫民窟。解锁后：在机器的世界里守住人性。' },
-    korea: { hint: '🔒 在大明道路经历「同窗来访」', fullText: '日常投影 · 首尔。解锁后：在咖啡店的日常里，过自己的人生。' },
+    korea: { hint: '🔒 在大明道路按私账融入官场', fullText: '日常投影 · 首尔。解锁后：在咖啡店的日常里，过自己的人生。' },
   };
-  Object.entries(lockInfo).forEach(([road, info]) => {
-    const card = document.getElementById(road + 'Card');
+  Object.entries(lockInfo).forEach(function(entry) {
+    var road = entry[0], info = entry[1];
+    var card = document.getElementById(road + 'Card');
     if (!card) return;
-    if (localStorage.getItem(road + 'Unlocked')) {
+    var unlocked = false;
+    try { unlocked = !!(typeof safeStorage !== 'undefined' ? safeStorage.get(road + 'Unlocked') : localStorage.getItem(road + 'Unlocked')); } catch(e) {}
+    if (unlocked) {
       card.style.display = '';
-      const lockEl = card.querySelector('.card-lock');
+      var lockEl = card.querySelector('.card-lock');
       if (lockEl) lockEl.remove();
     } else if (road === 'ai' && Math.random() < 0.3) {
       card.style.display = '';
-      localStorage.setItem('aiUnlocked', 'true');
-      const lockEl = card.querySelector('.card-lock');
-      if (lockEl) lockEl.remove();
+      try { if (typeof safeStorage !== 'undefined') safeStorage.set('aiUnlocked', 'true'); else localStorage.setItem('aiUnlocked', 'true'); } catch(e) {}
+      var lockEl2 = card.querySelector('.card-lock');
+      if (lockEl2) lockEl2.remove();
     } else {
-      // 显示锁定占位卡
       card.style.display = '';
       card.classList.add('locked-road');
       card.setAttribute('onclick', '');
       card.style.cursor = 'default';
-      const p = card.querySelector('p');
+      var p = card.querySelector('p');
       if (p) p.innerHTML = info.fullText;
-      // 移除点击事件，添加锁定标识
-      const era = card.querySelector('.card-era');
+      var era = card.querySelector('.card-era');
       if (era) era.textContent = info.hint;
     }
   });
-  // 混沌道路
-  const chaosEntry = document.getElementById('chaosEntry');
-  if (chaosEntry && localStorage.getItem('chaosUnlocked')) {
-    chaosEntry.style.display = '';
+  var chaosEntry = document.getElementById('chaosEntry');
+  if (chaosEntry) {
+    var chaosUnlocked = false;
+    try { chaosUnlocked = !!(typeof safeStorage !== 'undefined' ? safeStorage.get('chaosUnlocked') : localStorage.getItem('chaosUnlocked')); } catch(e) {}
+    if (chaosUnlocked) chaosEntry.style.display = '';
   }
 })();
 // V18 Round 3: 可访问性增强 — 键盘导航 + ARIA + 焦点管理

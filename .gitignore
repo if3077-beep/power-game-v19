@@ -1,3 +1,5 @@
 # 构建产物 — 维持多文件源码架构,不追踪 standalone 产物
 powergame-v18-standalone.html
 *-standalone.html
+node_modules/
+dist/
