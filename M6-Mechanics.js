@@ -4990,10 +4990,27 @@ function endTrialPlay() {
 // V20 R6: 清理试玩状态(回首页时调用)
 function resetGameState() {
   try {
-    state._isTrial = false;
-    state.choices = [];
-    state.debts = [];
+    // V20 R12: 补全 startGame 初始化的所有可变字段,避免试玩后残留状态污染下一局
     state.currentScene = 0;
+    state.debts = [];
+    state.channels = 5;
+    state.choices = [];
+    state.history = [];
+    state.usedEvents = [];
+    state.encounterUsed = false;
+    state.encounterScene = 0;
+    state.isHidden = false;
+    state.crisisHistory = [];
+    state.crisisCooldown = 0;
+    state.crisisStrikes = 0;
+    state.channelLossCount = 0;
+    state.extremeChannelTriggered = false;
+    state.intensity = 'normal';
+    state.calibration = null;
+    state._isTrial = false;
+    // scenario / _brightTheme 保留(下次 startGame 会完整覆盖)
+    // 清除试玩残留的会话存档
+    clearSession();
   } catch(e) {}
 }
 

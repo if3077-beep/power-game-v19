@@ -6,7 +6,7 @@
 <title>权力的游戏 v20</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Sans+KR:wght@300;400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700&family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="M1-CSS.css">
 </head>
 <body>
@@ -216,20 +216,20 @@
   });
 })();
 </script>
-<script src="analysis-engine.js"></script>
-<script src="analysis-renderer.js"></script>
-<script src="evo-lite.js"></script>
-<script src="calibrate.js"></script>
-<script src="M4-Data-WhiteHouse.js"></script>
-<script src="M5-Data-Ming.js"></script>
-<script src="M7-Data-AI.js"></script>
-<script src="M8-Data-Africa.js"></script>
-<script src="M9-Data-3077.js"></script>
-<script src="M10-Data-Korea.js"></script>
-<script src="M11-Data-Chaos.js"></script>
-<script src="M12-Data-Xianjian.js"></script>
-<script src="M3-Engine.js"></script>
-<script src="M6-Mechanics.js"></script>
+<script defer src="analysis-engine.js"></script>
+<script defer src="analysis-renderer.js"></script>
+<script defer src="evo-lite.js"></script>
+<script defer src="calibrate.js"></script>
+<script defer src="M4-Data-WhiteHouse.js"></script>
+<script defer src="M5-Data-Ming.js"></script>
+<script defer src="M7-Data-AI.js"></script>
+<script defer src="M8-Data-Africa.js"></script>
+<script defer src="M9-Data-3077.js"></script>
+<script defer src="M10-Data-Korea.js"></script>
+<script defer src="M11-Data-Chaos.js"></script>
+<script defer src="M12-Data-Xianjian.js"></script>
+<script defer src="M3-Engine.js"></script>
+<script defer src="M6-Mechanics.js"></script>
 <script>
 // V20 R6: 首页 UI 三套变体随机切换 — 现有(grid)20% / 列表变体40% / 沉浸变体40%
 (function pickLandingVariant() {
@@ -250,6 +250,9 @@
 </script>
 
 <script>
+// V20 R12: 以下逻辑依赖外部模块(safeStorage / showScreen / initLanding 等)。
+// 外部脚本已加 defer, 会在 DCL 前按序执行完毕, 故此处包进 DOMContentLoaded 以保证依赖就绪。
+window.addEventListener('DOMContentLoaded', function() {
 // V14.3: 隐藏道路解锁状态 — 未解锁时显示锁定占位卡
 (function() {
   var lockInfo = {
@@ -354,6 +357,7 @@
 })();
 // V14.6: 首页初始化 — 卡牌hover音效+标题乱码
 initLanding();
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
