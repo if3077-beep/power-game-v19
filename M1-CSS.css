@@ -1878,3 +1878,49 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   transform:translateY(8px);
 }
 
+/* V20.4: 文字加速按钮 —— 常驻右上角悬浮,低饱和度,激活态高亮 */
+.speed-toggle{
+  position:fixed;
+  top:0.9rem;
+  right:0.9rem;
+  z-index:600;
+  background:rgba(20,16,12,0.72);
+  color:var(--muted, #8a7a5a);
+  border:1px solid rgba(201,169,110,0.22);
+  border-radius:1.4rem;
+  padding:0.35rem 0.7rem;
+  font-size:0.72rem;
+  letter-spacing:0.06em;
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  font-family:inherit;
+}
+.speed-toggle:hover{
+  background:rgba(40,32,24,0.85);
+  color:var(--accent-w, #c9a96e);
+  border-color:rgba(201,169,110,0.5);
+  transform:translateY(-1px);
+}
+.speed-toggle:active{ transform:translateY(0) scale(0.96); }
+.speed-toggle.active{
+  background:rgba(201,169,110,0.18);
+  color:var(--accent-w, #c9a96e);
+  border-color:rgba(201,169,110,0.6);
+  box-shadow:0 0 0.6rem rgba(201,169,110,0.25);
+}
+/* V20.4 C1: 激活时闪电图标轻微脉动,提示加速态 */
+.speed-toggle.active::before{
+  content:'';
+  display:inline-block;
+  animation:speedPulse 1.4s ease-in-out infinite;
+}
+@keyframes speedPulse{
+  0%,100%{opacity:1;}
+  50%{opacity:0.55;}
+}
+/* 首页不显示加速按钮(landing 阶段无文字) */
+#landing.active ~ .speed-toggle,
+body:not(.in-game) .speed-toggle{ display:none; }
+

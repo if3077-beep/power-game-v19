@@ -646,6 +646,8 @@ function transition(callback) {
   overlay.classList.add('active');
   // V20 R10: 水墨晕染转场音效,与ink-bloom动画同步
   if (typeof audioEngine !== 'undefined') audioEngine.play('ink_bloom');
+  // V20.4: callback 延迟接入文字加速(620ms / sp),淡出 470ms 保持(太短无需 scale)
+  const sp = (typeof getTextSpeed === 'function') ? getTextSpeed() : 1.0;
   setTimeout(() => {
     window.scrollTo(0, 0);
     callback();
@@ -657,7 +659,7 @@ function transition(callback) {
         overlay.style.pointerEvents = 'none';
       }, 470);
     }, 90);
-  }, 620);
+  }, 620 / sp);
 }
 
 // --- 涟漪效果 ---
@@ -728,6 +730,8 @@ function flashScreen(color, duration) {
 
 // --- 打字机 ---
 function typewriter(el, text, callback) {
+  // V20.4: 接入全局文字加速(sd = speed divisor,1.0/1.5)
+  const sp = (typeof getTextSpeed === 'function') ? getTextSpeed() : 1.0;
   let i = 0;
   const cursor = document.createElement('span');
   cursor.className = 'typewriter-cursor';
@@ -742,10 +746,10 @@ function typewriter(el, text, callback) {
       }
       i++;
       const ch = text[i - 1];
-      const speed = ch === '。' ? 120 : ch === '，' ? 80 : ch === '\n' ? 200 : 25 + Math.random() * 20;
-      setTimeout(type, speed);
+      const base = ch === '。' ? 120 : ch === '，' ? 80 : ch === '\n' ? 200 : 25 + Math.random() * 20;
+      setTimeout(type, base / sp);
     } else {
-      setTimeout(() => { cursor.remove(); if (callback) callback(); }, 500);
+      setTimeout(() => { cursor.remove(); if (callback) callback(); }, 500 / sp);
     }
   }
   type();
@@ -859,6 +863,8 @@ function loseChannel(reason) {
 function confirmExit() {
   if (confirm('确定要返回首页吗？当前进度不会保存。')) {
     showScreen('landing');
+    // V20.4: 移除游戏态标记(隐藏加速按钮)
+    document.body.classList.remove('in-game');
     document.getElementById('vignette').classList.remove('active');
     document.getElementById('scanline').classList.remove('active');
     stopBGM();

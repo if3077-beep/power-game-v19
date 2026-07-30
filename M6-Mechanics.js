@@ -462,6 +462,31 @@ function getScenePowerInsight(scenarioKey, sceneTitle, debtCategory) {
 const CROSS_PLAY_FLAGS_KEY = 'pg_crossPlayFlags_v1';
 let historyFlags = loadCrossPlayFlags();
 
+// V20.4: 文字加速 — 全局乘数(1.0 默认 / 1.5 加速),所有 typewriter 与渲染 setTimeout 除以此值
+// 持久化到 sessionStorage,同局保持;startGame 时读取
+const TEXT_SPEED_KEY = 'pg_textSpeed';
+function getTextSpeed() {
+  try {
+    const v = parseFloat(sessionStorage.getItem(TEXT_SPEED_KEY));
+    return (v === 1.0 || v === 1.5) ? v : 1.0;
+  } catch (e) { return 1.0; }
+}
+function setTextSpeed(v) {
+  try { sessionStorage.setItem(TEXT_SPEED_KEY, String(v)); } catch (e) {}
+}
+function toggleTextSpeed() {
+  const cur = getTextSpeed();
+  const next = cur >= 1.5 ? 1.0 : 1.5;
+  setTextSpeed(next);
+  const btn = document.getElementById('speedToggle');
+  if (btn) {
+    btn.textContent = next >= 1.5 ? '⚡×1.5' : '⚡×1.0';
+    btn.classList.toggle('active', next >= 1.5);
+  }
+}
+// 把固定延迟按当前速度缩放(值越大越快,延迟越短)
+function sd(ms) { return ms / getTextSpeed(); }
+
 function loadCrossPlayFlags() {
   try {
     const raw = localStorage.getItem(CROSS_PLAY_FLAGS_KEY);
@@ -1390,6 +1415,14 @@ function showCalibrate(scenarioKey) {
 function startGame(scenarioKey) {
   // 自动初始化并开启音频
   audioEngine.enable();
+  // V20.4: 标记进入游戏态(显示加速按钮),并同步按钮状态
+  document.body.classList.add('in-game');
+  const sp = getTextSpeed();
+  const sBtn = document.getElementById('speedToggle');
+  if (sBtn) {
+    sBtn.textContent = sp >= 1.5 ? '⚡×1.5' : '⚡×1.0';
+    sBtn.classList.toggle('active', sp >= 1.5);
+  }
 
   const isHidden = ['africa', 'cyber', 'korea', 'chaos'].includes(scenarioKey);
   // V14.1: 隐藏道路随机难度 — 40%高强度, 60%普通
@@ -1552,6 +1585,20 @@ function renderScene() {
   // 应用历史联动效果
   const scene = applyHistoryEffects(rawScene, state.scenario);
 
+  // V20.4 [B2]: 幽灵回响 — 中档(channels 2-4)且首场景之后,8% 概率 prepend 一句跨局氛围低语
+  // 不生成完整事件,仅一句短文本,强化"选择有回响"的惊喜感(纯随机,保留低概率元素)
+  if (state.currentScene > 0 && state.channels >= 2 && state.channels <= 4 && Math.random() < 0.08) {
+    const whispers = [
+      '——远方有人低语,像是在念你的名字。',
+      '空气里有一丝别的时代的气味,一闪而过。',
+      '你忽然想起一个从未做过但好像做过的选择。',
+      '有什么东西,从另一条路上传了过来。',
+      '这一刻,你觉得不止一个人在替你呼吸。'
+    ];
+    const w = whispers[Math.floor(Math.random() * whispers.length)];
+    scene.text = w + '\n\n' + scene.text;
+  }
+
   // V21 [L1]: textVariants 按渠道档选择——低档冷峻/高档壮烈/中档默认
   if (scene.textVariants && scene.textVariants.length > 0) {
     const ch = state.channels;
@@ -1651,7 +1698,7 @@ function renderScene() {
         tintEl.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
       }
     }
-  }, 100);
+  }, sd(100));
 
   setTimeout(() => {
     textEl.style.opacity = '1';
@@ -1663,7 +1710,7 @@ function renderScene() {
         narratorEl.style.transform = 'translateY(0)';
         narratorEl.style.transition = 'all 0.8s ease';
         narratorEl.innerHTML = scene.narrator;
-      }, 300);
+      }, sd(300));
       setTimeout(() => {
         choicesEl.style.opacity = '1';
         choicesEl.style.transform = 'translateY(0)';
@@ -1684,11 +1731,11 @@ function renderScene() {
             btn.style.transition = 'all 0.5s cubic-bezier(0.23,1,0.32,1)';
             btn.style.opacity = '1';
             btn.style.transform = 'translateX(0)';
-          }, 200 + i * 150);
+          }, sd(200 + i * 150));
         });
-      }, 800);
+      }, sd(800));
     });
-  }, 400);
+  }, sd(400));
 
   // V14.6: 低概率画面特效 — 局部高斯模糊(5%) / 碎片破碎(3%)
   triggerSceneEffects();
@@ -2751,11 +2798,8 @@ function makeChoice(index) {
             else transition(() => renderScene());
           } else if (state.currentScene === sc.scenes.length - 1) {
             transition(() => renderFinalEvent());
-          } else if (state.currentScene % 2 === 1 && Math.random() < 0.6) {
-            // V14.5: 60%概率触发随机事件 (增加重复体验差异)
-            transition(() => renderRandomEvent());
-          } else if (state.currentScene % 2 === 0 && Math.random() < 0.15) {
-            // V14.5: 15%概率在偶数场景触发随机事件 (意外插曲)
+          } else if (state.currentScene > 0 && Math.random() < 0.45) {
+            // V20.4: 统一 45% 概率触发随机事件(去掉奇偶约束,首场景不触发避免一进游戏就跳事件)
             transition(() => renderRandomEvent());
           } else {
             transition(() => renderScene());
@@ -3557,8 +3601,8 @@ function renderRandomEvent() {
       const crossGen = new CrossPathGenerator();
       const crossEvents = crossGen.generate(historyFlags, state.scenario, evo && evo.rng);
       if (crossEvents && crossEvents.length > 0) {
-        // 40% 概率优先选择跨道路事件 (若存在) — 强化"选择有回响"叙事
-        if (Math.random() < 0.4) {
+        // V20.4: 50% 概率优先选择跨道路事件 (原40%,强化"选择有回响"叙事)
+        if (Math.random() < 0.5) {
           pool = crossEvents.concat(pool);
         }
       }
