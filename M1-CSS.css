@@ -46,10 +46,6 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 
 /* LANDING */
 #landing{align-items:center;justify-content:center;text-align:center;padding:2rem;}
-/* V20: 标题眉标 — 提升主页表现力 */
-.landing-eyebrow{display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-bottom:1.1rem;animation:fadeUp 1.2s ease-out 0.1s both;}
-.landing-eyebrow-line{width:42px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.55),transparent);}
-.landing-eyebrow-text{font-family:'Rajdhani','Noto Serif SC',sans-serif;font-size:0.72rem;color:var(--accent-w);letter-spacing:0.32em;text-transform:uppercase;opacity:0.8;}
 #landing h1{font-family:'Noto Serif SC',serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:0.1em;margin-bottom:0.5rem;position:relative;background:linear-gradient(135deg,var(--text),var(--accent-w));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeUp 1.2s ease-out;}
 #landing .subtitle{font-size:clamp(0.9rem,2vw,1.2rem);color:var(--muted);margin-bottom:2rem;animation:fadeUp 1.2s ease-out 0.3s both;transition:opacity 0.5s ease,transform 0.5s ease;line-height:1.8;min-height:5em;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 /* V14.3: 混沌入口 — 精巧标题附近链接 */

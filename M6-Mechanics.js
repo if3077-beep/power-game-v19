@@ -4951,13 +4951,12 @@ function startTrialPlay() {
   if (typeof audioEngine !== 'undefined') audioEngine.enable();
   // 跳过校准面板,使用默认画像直接开始
   pendingCalibration = null;
-  // 直接开始游戏,标记为试玩模式 (state._isTrial = true)
-  transition(() => {
-    startGame(t.scenario);
-    state._isTrial = true;
-    // 试玩提示:首屏右下角浮层
-    setTimeout(() => showTrialHint(), 800);
-  });
+  // V20 R11: 直接调用 startGame — 它内部已自带 transition() 转场,
+  // 此处若再包一层 transition() 会与内层叠加导致墨晕重排闪现,故省略外层包裹。
+  startGame(t.scenario);
+  state._isTrial = true;
+  // 试玩提示:首屏右下角浮层
+  setTimeout(() => showTrialHint(), 800);
 }
 function showTrialHint() {
   const hint = document.createElement('div');
