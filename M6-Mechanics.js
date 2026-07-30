@@ -1247,8 +1247,8 @@ const preludeData = {
       dilemma: {
         text: '妈妈发来消息："邻居家的孩子进了三星，你呢？"社团前辈也发来消息："我们创业团队缺人，要不要来聊聊？"',
         choices: [
-          { text: '回复妈妈——先应付过去', micro: '你打了三个字："在考虑。"然后删了，又打了三个字。', fateHint: '善意的谎言是最温柔的牢笼。' },
-          { text: '回复前辈——去聊聊', micro: '你的心跳快了一拍。不是因为兴奋，是因为恐惧。', fateHint: '恐惧是改变的前奏——但改变不一定是好事。' }
+          { text: '回复妈妈——先应付过去', micro: '你打了三个字："在考虑。"然后删了，又打了三个字。', fateHint: '善意的谎言是最温柔的牢笼。', effect: { channel: 1, tag: 'avoid' } },
+          { text: '回复前辈——去聊聊', micro: '你的心跳快了一拍。不是因为兴奋，是因为恐惧。', fateHint: '恐惧是改变的前奏——但改变不一定是好事。', effect: { channel: -1, tag: 'risk' } }
         ]
       }
     },
@@ -1258,8 +1258,8 @@ const preludeData = {
       dilemma: {
         text: '深夜，你在便利店打工。一个醉汉走进来，看着你说："年轻人，你这么晚还上班？你不想做点别的？"你看着他凌乱的西装和疲惫的脸。',
         choices: [
-          { text: '"我也想——但不知道做什么"', micro: '他笑了。"我当年也不知道。现在知道了——但太晚了。"', fateHint: '迷茫是年轻人的特权——但它不会永远等你。' },
-          { text: '"这就是我想做的"', micro: '他看了你一眼。"你骗谁呢？"', fateHint: '对自己撒谎是最安全的——因为你不会被揭穿。' }
+          { text: '"我也想——但不知道做什么"', micro: '他笑了。"我当年也不知道。现在知道了——但太晚了。"', fateHint: '迷茫是年轻人的特权——但它不会永远等你。', effect: { channel: 0, tag: 'passive' } },
+          { text: '"这就是我想做的"', micro: '他看了你一眼。"你骗谁呢？"', fateHint: '对自己撒谎是最安全的——因为你不会被揭穿。', effect: { channel: 1, tag: 'self-deception' } }
         ]
       }
     },
@@ -1269,19 +1269,75 @@ const preludeData = {
       dilemma: {
         text: '大学同学聚会。有人问你："你现在在哪高就？"你端着啤酒，看着他们光鲜的朋友圈照片。',
         choices: [
-          { text: '"在一家创业公司"', micro: '你说的是咖啡店。但"创业公司"听起来好多了。', fateHint: '包装是社交的润滑剂——但它也是自尊的防腐剂。' },
-          { text: '"在咖啡店打工"', micro: '桌上安静了两秒。有人打圆场："哈哈，体验生活嘛。"', fateHint: '诚实是最硬的铠甲——但它也是最冷的。' }
+          { text: '"在一家创业公司"', micro: '你说的是咖啡店。但"创业公司"听起来好多了。', fateHint: '包装是社交的润滑剂——但它也是自尊的防腐剂。', effect: { channel: 1, tag: 'image' } },
+          { text: '"在咖啡店打工"', micro: '桌上安静了两秒。有人打圆场："哈哈，体验生活嘛。"', fateHint: '诚实是最硬的铠甲——但它也是最冷的。', effect: { channel: -1, tag: 'honest' } }
+        ]
+      }
+    }
+  ],
+  // V21: 仙剑道路补齐 prelude(此前缺失,直接走 showIntro)
+  xianjian: [
+    {
+      bgText: '渝州城 · 永安当 · 晨',
+      suspense: '魔剑出世那夜,六界的钟都响了一遍。你以为是传说——直到它闯进你的当铺。',
+      sideHint: '【异闻】蜀山弟子云游至此,或与你结一段剑缘。',
+      dilemma: {
+        text: '红衣女子怀抱着泛蓝光的魔剑闯入永安当,身后追兵已至门外。她喘着气说:"求你——替我挡一挡。我不会白欠你。"景天(你)手里的朝奉算盘还没放下。',
+        choices: [
+          { text: '护下她——"永安当不缺这一桩闲事"', micro: '你把算盘往袖里一收,挡在了她身前。追兵愣住了——当铺的伙计,竟敢管江湖事。', fateHint: '一念之仁,六界的因果从此缠上你。', effect: { channel: 1, tag: 'chivalry' } },
+          { text: '装作没看见——"小本生意,惹不起"', micro: '你低头拨算盘,假装在算账。她看了你一眼,那眼神——比魔剑还冷。', fateHint: '明哲保身的人,往往保不住自己。', effect: { channel: 0, tag: 'caution' } }
+        ]
+      }
+    },
+    {
+      bgText: '当铺的朝奉,本是局外人',
+      suspense: '可剑认了主,主认了你——你想躲,也躲不掉了。',
+      sideHint: '【异闻】魔剑中似有一缕残魂,夜半低语,自称"前世故人"。',
+      dilemma: {
+        text: '夜里,魔剑自行出鞘,悬在你床前。剑身映出一张脸——不是你的,却莫名熟悉。一个声音问:"你,还记得三生石前的誓吗?"',
+        choices: [
+          { text: '伸手触碰——"我似乎……认得你"', micro: '指尖触到剑刃的瞬间,一股记忆涌来——不是这一世的。', fateHint: '前世的债,今生总要还。', effect: { channel: -1, tag: 'fate' } },
+          { text: '退后——"剑兄,我们不熟"', micro: '魔剑颤了一下,缓缓归鞘。但它没走——就在你枕边,一夜未动。', fateHint: '拒绝命运的人,命运反而缠得更紧。', effect: { channel: 1, tag: 'defy-fate' } }
+        ]
+      }
+    },
+    {
+      bgText: '渝州城的早市,热闹得不像人间',
+      suspense: '可今日的烟火气里,混进了一缕不属于此界的味道。',
+      dilemma: {
+        text: '你正给一柄旧剑估价,掌柜的使眼色让你看柜台外——一个青衣书生,周身无半点人气,却在挑拣人间的糖葫芦。他抬头,与你四目相对。',
+        choices: [
+          { text: '上前搭话——"先生,这糖葫芦可甜?"', micro: '他笑了,笑得像一阵风过竹林。"甜。可惜——我已尝不出。"', fateHint: '与鬼神相交,需有一份不惧生死的坦然。', effect: { channel: 1, tag: 'spirit-bond' } },
+          { text: '默默避开——"非我族类"', micro: '他似乎察觉了,放下糖葫芦,消失在人群里。但那串糖葫芦,留在了你柜台上。', fateHint: '敬鬼神而远之——是凡人最安全的智慧。', effect: { channel: 0, tag: 'distance' } }
+        ]
+      }
+    }
+  ],
+  // V21: chaos 时空之渊补 prelude
+  chaos: [
+    {
+      bgText: '时空之渊 · 无昼无夜',
+      suspense: '这里所有被遗弃的可能性,都在低声说话。你听不清——但它们在叫你的名字。',
+      sideHint: '【异闻】渊底漂浮着一缕"未走完的路",触碰它可窥见另一条命运的终章。',
+      dilemma: {
+        text: '你站在渊边,脚下是无数破碎的时空碎片。一个声音从深处传来:"你来了。你是想找回什么——还是想丢掉什么?"',
+        choices: [
+          { text: '"我想找回——失去的可能"', micro: '渊底泛起光,映出你从未走过的那条路。', fateHint: '回望是最温柔的刑具。', effect: { channel: -1, tag: 'nostalgia' } },
+          { text: '"我想丢掉——已知的结局"', micro: '碎片纷纷碎裂,又重新拼合。你听见自己——在另一个时空笑了。', fateHint: '遗忘是另一种拥有。', effect: { channel: 1, tag: 'release' } }
         ]
       }
     }
   ]
 };
 
-// V14.1: 概率触发前置动画（60%概率），每次随机选择一个前置事件
+// V14.1: 概率触发前置动画，每次随机选择一个前置事件
+// V21: 提升至 70% 概率; 补齐 xianjian/chaos; 显示道路图标 + 支线异闻预告 + 选项影响后续
 let currentPrelude = null;
+let pendingPreludeEffect = null; // V21: 开幕选择的影响,在 startGame 中应用
+const PRELUDE_ICON = { whitehouse:'🏛️', ming:'🏯', ai:'🤖', africa:'🌍', cyber:'⚡', korea:'🌸', xianjian:'🗡️', chaos:'🌀' };
 function renderPrelude(scenarioKey) {
   const events = preludeData[scenarioKey];
-  if (!events || events.length === 0 || Math.random() > 0.5) {
+  if (!events || events.length === 0 || Math.random() > 0.7) {
     showIntro(scenarioKey);
     return;
   }
@@ -1291,11 +1347,14 @@ function renderPrelude(scenarioKey) {
   const screen = document.getElementById('prelude-screen');
   document.body.className = `theme-${scenarioKey}`;
 
-  // 阶段1：视觉冲击（2秒）
+  // V21: 阶段1 — 视觉冲击 + 道路图标(2秒)
+  const icon = PRELUDE_ICON[scenarioKey] || '✦';
   screen.innerHTML = `
     <div class="prelude-container">
+      <div class="prelude-icon">${icon}</div>
       <div class="prelude-bg-text">${prelude.bgText}</div>
       <div class="prelude-suspense">${prelude.suspense}</div>
+      ${prelude.sideHint ? `<div class="prelude-side-hint">${prelude.sideHint}</div>` : ''}
     </div>
   `;
   // V20.3: 加水墨转场,与 showIntro 一致(此前 prelude 从 landing 直接切换,无过渡)
@@ -1329,6 +1388,13 @@ function makePreludeChoice(scenarioKey, index) {
   const prelude = currentPrelude;
   const choice = prelude.dilemma.choices[index];
   const screen = document.getElementById('prelude-screen');
+
+  // V21: 记录开幕选择的影响,供 startGame 应用
+  if (choice.effect) {
+    pendingPreludeEffect = { scenario: scenarioKey, tag: choice.effect.tag, channel: choice.effect.channel || 0 };
+  } else {
+    pendingPreludeEffect = null;
+  }
 
   // 音效
   audioEngine.play('click');
@@ -1437,6 +1503,12 @@ function startGame(scenarioKey) {
     const chBonus = Math.max(0, state.calibration.values.channel - 3);
     state.channels = Math.min(8, 5 + chBonus);
   }
+  // V21: 应用开幕选择(prelude)的轻微影响 — 渠道 ±1 + 标记倾向(供事件分发参考)
+  state.preludeEffect = pendingPreludeEffect || null;
+  if (state.preludeEffect && state.preludeEffect.channel) {
+    state.channels = Math.max(2, Math.min(8, state.channels + state.preludeEffect.channel));
+  }
+  pendingPreludeEffect = null;
   // V18 Round 2: 初始化雷达图 + 命运河流
   if (!radarChart) radarChart = new RadarChart('radarCanvas');
   if (!fateRiver) fateRiver = new FateRiver('fateRiverCanvas');

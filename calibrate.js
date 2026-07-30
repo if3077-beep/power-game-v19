@@ -42,92 +42,95 @@
       this._onComplete = null;
     }
 
-    /** 渲染校准面板到 #calibrate-screen */
+    /** 渲染校准面板到 #calibrate-screen — V21: 精简为单卡轮播 */
     show(scenarioKey, onComplete) {
       this._onComplete = onComplete;
+      this._idx = 0;
+      this.selectedPersona = PERSONAS[0].id;
+      this.values = { power: PERSONAS[0].power, relation: PERSONAS[0].relation, channel: PERSONAS[0].channel };
       const screen = document.getElementById('calibrate-screen');
       if (!screen) return;
+
+      // V21: 三轴迷你点条 — 直观显示人格倾向,无需手动拖滑块
+      const dots = (v) => Array.from({length:5},(_,i)=>`<span class="axis-dot ${i<v?'on':''}"></span>`).join('');
+      const axisRow = (label, key, val) => `
+        <div class="axis-row">
+          <span class="axis-label">${label}</span>
+          <span class="axis-dots">${dots(val)}</span>
+          <span class="axis-word">${SLIDER_LABELS[key][val]}</span>
+        </div>`;
+
+      const renderCard = (p) => `
+        <div class="persona-card-big" data-persona="${p.id}">
+          <span class="persona-icon-big">${p.icon}</span>
+          <div class="persona-name-big">${p.name}</div>
+          <div class="persona-desc-big">${p.desc}</div>
+          <div class="axis-preview">
+            ${axisRow('权力欲','power',p.power)}
+            ${axisRow('关系','relation',p.relation)}
+            ${axisRow('渠道','channel',p.channel)}
+          </div>
+        </div>`;
 
       screen.innerHTML = `
         <div class="calibrate-container">
           <div>
             <h2 class="cal-title">校准你的命运</h2>
-            <p class="cal-sub">在踏入权力之前, 先选择你的处世姿态——它将影响事件如何向你涌来。</p>
+            <p class="cal-sub">选择一种处世姿态——它将影响事件如何向你涌来。</p>
           </div>
-
-          <div class="persona-section">
-            <div class="persona-section-title">— 选择人格底色 —</div>
-            <div class="persona-grid" id="personaGrid">
-              ${PERSONAS.map(p => `
-                <div class="persona-card" data-persona="${p.id}" onclick="calibratePanel.selectPersona('${p.id}')">
-                  <span class="persona-icon">${p.icon}</span>
-                  <div class="persona-name">${p.name}</div>
-                  <div class="persona-desc">${p.desc}</div>
-                </div>
-              `).join('')}
-            </div>
+          <div class="persona-carousel">
+            <button class="carousel-arrow prev" onclick="calibratePanel.cycle(-1)" aria-label="上一个">‹</button>
+            <div class="persona-stage" id="personaStage">${renderCard(PERSONAS[0])}</div>
+            <button class="carousel-arrow next" onclick="calibratePanel.cycle(1)" aria-label="下一个">›</button>
           </div>
-
-          <div class="slider-section">
-            <div class="slider-section-title">— 微调三轴参数 —</div>
-            <div class="slider-stack">
-              <div class="slider-row">
-                <div class="slider-info"><span class="slider-label">权力欲</span><span class="slider-val" id="valPower">平衡</span></div>
-                <input type="range" class="range-slider" id="slPower" min="1" max="5" value="3" oninput="calibratePanel.onSlider('power', this.value)">
-                <div class="slider-range"><span>淡泊</span><span>野心</span></div>
-              </div>
-              <div class="slider-row">
-                <div class="slider-info"><span class="slider-label">关系重视度</span><span class="slider-val" id="valRelation">平衡</span></div>
-                <input type="range" class="range-slider" id="slRelation" min="1" max="5" value="3" oninput="calibratePanel.onSlider('relation', this.value)">
-                <div class="slider-range"><span>冷漠</span><span>深情</span></div>
-              </div>
-              <div class="slider-row">
-                <div class="slider-info"><span class="slider-label">渠道敏感度</span><span class="slider-val" id="valChannel">平衡</span></div>
-                <input type="range" class="range-slider" id="slChannel" min="1" max="5" value="3" oninput="calibratePanel.onSlider('channel', this.value)">
-                <div class="slider-range"><span>迟钝</span><span>全知</span></div>
-              </div>
-            </div>
-          </div>
-
+          <div class="persona-pager" id="personaPager"></div>
           <div class="cal-footer">
-            <button class="cal-btn" onclick="calibratePanel.skip()">跳过校准</button>
-            <button class="cal-btn primary" onclick="calibratePanel.confirm()">踏入命运 →</button>
+            <button class="cal-btn" onclick="calibratePanel.skip()">跳过</button>
+            <button class="cal-btn primary" onclick="calibratePanel.confirm()">以此姿态踏入 →</button>
           </div>
         </div>
       `;
-
+      this._renderPager();
       document.body.className = `theme-${scenarioKey}`;
       showScreen('calibrate-screen');
       audioEngine.play('chapter');
     }
 
-    selectPersona(id) {
-      this.selectedPersona = id;
-      const p = PERSONAS.find(x => x.id === id);
-      if (!p) return;
-      // 应用预设值到 slider
+    // V21: 轮播切换
+    cycle(dir) {
+      this._idx = (this._idx + dir + PERSONAS.length) % PERSONAS.length;
+      const p = PERSONAS[this._idx];
+      this.selectedPersona = p.id;
       this.values = { power: p.power, relation: p.relation, channel: p.channel };
-      document.getElementById('slPower').value = p.power;
-      document.getElementById('slRelation').value = p.relation;
-      document.getElementById('slChannel').value = p.channel;
-      this._updateSliderLabels();
-      // 高亮选中卡
-      document.querySelectorAll('.persona-card').forEach(c => c.classList.toggle('selected', c.dataset.persona === id));
-      audioEngine.play('click');
+      const dots = (v) => Array.from({length:5},(_,i)=>`<span class="axis-dot ${i<v?'on':''}"></span>`).join('');
+      const axisRow = (label, key, val) => `<div class="axis-row"><span class="axis-label">${label}</span><span class="axis-dots">${dots(val)}</span><span class="axis-word">${SLIDER_LABELS[key][val]}</span></div>`;
+      const stage = document.getElementById('personaStage');
+      if (stage) {
+        stage.style.opacity = '0'; stage.style.transform = `translateX(${dir>0?-12:12}px)`;
+        setTimeout(() => {
+          stage.innerHTML = `<span class="persona-icon-big">${p.icon}</span><div class="persona-name-big">${p.name}</div><div class="persona-desc-big">${p.desc}</div><div class="axis-preview">${axisRow('权力欲','power',p.power)}${axisRow('关系','relation',p.relation)}${axisRow('渠道','channel',p.channel)}</div>`;
+          stage.style.opacity = '1'; stage.style.transform = 'translateX(0)';
+        }, 180);
+      }
+      this._renderPager();
+      audioEngine.play('choice_hover');
     }
 
-    onSlider(key, val) {
-      this.values[key] = parseInt(val, 10);
-      this.selectedPersona = null; // 手动调整后取消预设选中
-      document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
-      this._updateSliderLabels();
+    _renderPager() {
+      const pager = document.getElementById('personaPager');
+      if (!pager) return;
+      pager.innerHTML = PERSONAS.map((p,i)=>`<span class="pager-dot ${i===this._idx?'active':''}"></span>`).join('');
     }
 
-    _updateSliderLabels() {
-      document.getElementById('valPower').textContent = SLIDER_LABELS.power[this.values.power];
-      document.getElementById('valRelation').textContent = SLIDER_LABELS.relation[this.values.relation];
-      document.getElementById('valChannel').textContent = SLIDER_LABELS.channel[this.values.channel];
+    selectPersona(id) {
+      const idx = PERSONAS.findIndex(p => p.id === id);
+      if (idx < 0) return;
+      this.cycle(idx - this._idx);
     }
+
+    onSlider(key, val) { /* V21: 已移除手动滑块,保留空函数避免外部调用报错 */ }
+
+    _updateSliderLabels() { /* V21: 已移除 */ }
 
     confirm() {
       audioEngine.play('click');

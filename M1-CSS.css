@@ -1120,6 +1120,9 @@ body.theme-ai .game-header::before{
 .prelude-container{max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;}
 .prelude-bg-text{font-family:'Noto Serif SC',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:0.15em;color:var(--accent-w);opacity:0;animation:preludeBgIn 1.5s cubic-bezier(0.23,1,0.32,1) 0.2s both;text-shadow:0 0 40px rgba(201,169,110,0.2);}
 .prelude-suspense{font-size:clamp(0.85rem,2vw,1.05rem);color:var(--muted);line-height:2;margin-top:1.5rem;opacity:0;animation:preludeSuspenseIn 1.2s ease-out 0.8s both;max-width:500px;}
+/* V21: 道路图标 + 支线异闻预告 */
+.prelude-icon{font-size:3.2rem;line-height:1;margin-bottom:1.2rem;opacity:0;animation:preludeSuspenseIn 1s ease-out 0.1s both;filter:drop-shadow(0 0 20px rgba(201,169,110,0.4));}
+.prelude-side-hint{margin-top:1.4rem;padding:0.55rem 1.1rem;font-size:0.72rem;color:#b8a9d4;letter-spacing:0.08em;border:1px dashed rgba(184,169,212,0.35);border-radius:6px;background:rgba(184,169,212,0.04);opacity:0;animation:preludeSuspenseIn 1s ease-out 1.4s both;max-width:520px;line-height:1.7;font-style:italic;}
 @keyframes preludeBgIn{0%{opacity:0;transform:translateY(40px) scale(0.9);filter:blur(10px);}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}}
 @keyframes preludeSuspenseIn{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
 .prelude-dilemma{margin-top:3rem;opacity:0;transform:translateY(30px);transition:opacity 0.8s cubic-bezier(0.23,1,0.32,1),transform 0.8s cubic-bezier(0.23,1,0.32,1);}
@@ -1680,6 +1683,31 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
 .persona-icon{font-size:1.6rem;display:block;margin-bottom:0.4rem;}
 .persona-name{font-family:'Noto Serif SC',serif;font-size:0.85rem;font-weight:700;margin-bottom:0.2rem;}
 .persona-desc{font-size:0.7rem;color:var(--muted);line-height:1.5;}
+
+/* V21: 精简校准 — 单卡轮播 */
+.persona-carousel{display:flex;align-items:center;justify-content:center;gap:1rem;opacity:0;animation:calFadeIn 0.8s var(--ease-out-expo) 0.5s forwards;}
+.carousel-arrow{width:44px;height:44px;border-radius:50%;flex-shrink:0;background:var(--card-bg);border:1px solid var(--card-border);color:var(--accent-w);font-size:1.6rem;line-height:1;cursor:pointer;transition:transform 0.3s var(--ease-out-expo),background 0.3s var(--ease-out-expo),box-shadow 0.3s var(--ease-out-expo);}
+.carousel-arrow:hover{background:rgba(201,169,110,0.12);transform:scale(1.1);box-shadow:var(--glow-w);}
+.persona-stage{flex:1;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.6rem 1.4rem;background:var(--card-bg);border:1px solid var(--accent-w);border-radius:14px;box-shadow:var(--glow-w);transition:opacity 0.2s ease,transform 0.3s var(--ease-out-expo);}
+.persona-icon-big{font-size:3rem;line-height:1;margin-bottom:0.6rem;filter:drop-shadow(0 0 16px rgba(201,169,110,0.3));}
+.persona-name-big{font-family:'Noto Serif SC',serif;font-size:1.4rem;font-weight:700;letter-spacing:0.08em;margin-bottom:0.3rem;}
+.persona-desc-big{font-size:0.82rem;color:var(--muted);margin-bottom:1.1rem;}
+.axis-preview{display:flex;flex-direction:column;gap:0.45rem;width:100%;max-width:280px;}
+.axis-row{display:flex;align-items:center;gap:0.7rem;font-size:0.72rem;}
+.axis-label{width:3rem;text-align:right;color:var(--muted);letter-spacing:0.05em;}
+.axis-dots{flex:1;display:flex;gap:4px;justify-content:center;}
+.axis-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.12);transition:background 0.3s ease;}
+.axis-dot.on{background:var(--accent-w);box-shadow:0 0 6px rgba(201,169,110,0.5);}
+.axis-word{width:3rem;color:var(--accent-w);}
+.persona-pager{display:flex;justify-content:center;gap:6px;opacity:0;animation:calFadeIn 0.8s var(--ease-out-expo) 0.7s forwards;}
+.pager-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all 0.3s ease;}
+.pager-dot.active{background:var(--accent-w);width:20px;border-radius:4px;}
+@media (max-width:600px){
+  .persona-stage{min-height:220px;padding:1.2rem 0.9rem;}
+  .persona-icon-big{font-size:2.4rem;}
+  .persona-name-big{font-size:1.2rem;}
+  .carousel-arrow{width:38px;height:38px;font-size:1.4rem;}
+}
 
 /* slider stack */
 .slider-section{opacity:0;animation:calFadeIn 0.8s var(--ease-out-expo) 0.7s forwards;}
