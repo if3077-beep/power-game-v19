@@ -46,6 +46,10 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 
 /* LANDING */
 #landing{align-items:center;justify-content:center;text-align:center;padding:2rem;}
+/* V20: 标题眉标 — 提升主页表现力 */
+.landing-eyebrow{display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-bottom:1.1rem;animation:fadeUp 1.2s ease-out 0.1s both;}
+.landing-eyebrow-line{width:42px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.55),transparent);}
+.landing-eyebrow-text{font-family:'Rajdhani','Noto Serif SC',sans-serif;font-size:0.72rem;color:var(--accent-w);letter-spacing:0.32em;text-transform:uppercase;opacity:0.8;}
 #landing h1{font-family:'Noto Serif SC',serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:0.1em;margin-bottom:0.5rem;position:relative;background:linear-gradient(135deg,var(--text),var(--accent-w));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeUp 1.2s ease-out;}
 #landing .subtitle{font-size:clamp(0.9rem,2vw,1.2rem);color:var(--muted);margin-bottom:2rem;animation:fadeUp 1.2s ease-out 0.3s both;transition:opacity 0.5s ease,transform 0.5s ease;line-height:1.8;min-height:5em;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 /* V14.3: 混沌入口 — 精巧标题附近链接 */
@@ -68,14 +72,23 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 /* V19 R4.1: 3秒试玩预览条 — 吸引非文字游戏群体 */
 .trial-preview{max-width:520px;margin:0 auto 2.5rem;animation:fadeUp 0.9s var(--ease-out-expo) 0.7s both;}
 .trial-label{font-size:0.68rem;color:var(--accent-w);letter-spacing:0.18em;opacity:0.75;margin-bottom:0.7rem;text-align:center;text-transform:uppercase;}
-.trial-card{position:relative;padding:1.2rem 1.5rem;background:linear-gradient(135deg,rgba(201,169,110,0.06),rgba(184,169,212,0.04));border:1px solid rgba(201,169,110,0.22);border-radius:14px;cursor:pointer;transition:all 0.45s var(--ease-out-expo);overflow:hidden;}
-.trial-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.1),transparent);transition:left 0.8s var(--ease-out-expo);}
+/* V20: 试玩入口眉标 — 呼吸点 + 标签 */
+.trial-eyebrow{display:flex;align-items:center;justify-content:center;gap:0.55rem;margin-bottom:0.9rem;font-family:'Rajdhani','Noto Serif SC',sans-serif;font-size:0.7rem;color:var(--accent-w);letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;}
+.trial-eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-w);box-shadow:0 0 10px rgba(201,169,110,0.8);animation:trialPulse 1.8s ease-in-out infinite;}
+@keyframes trialPulse{0%,100%{opacity:0.4;transform:scale(0.85);}50%{opacity:1;transform:scale(1.25);box-shadow:0 0 16px rgba(201,169,110,0.9);}}
+.trial-card{position:relative;padding:1.4rem 1.6rem 1.3rem;background:linear-gradient(135deg,rgba(201,169,110,0.08),rgba(184,169,212,0.05));border:1px solid rgba(201,169,110,0.28);border-radius:14px;cursor:pointer;transition:all 0.45s var(--ease-out-expo);overflow:hidden;}
+.trial-card-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,169,110,0.12),transparent 65%);opacity:0.6;pointer-events:none;transition:opacity 0.45s ease;}
+.trial-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.12),transparent);transition:left 0.8s var(--ease-out-expo);}
 .trial-card:hover::before{left:100%;}
-.trial-card:hover{border-color:rgba(201,169,110,0.5);transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,0.35),0 0 30px rgba(201,169,110,0.1);}
-.trial-scene-tag{font-family:'Rajdhani','Noto Serif SC',sans-serif;font-size:0.7rem;color:var(--accent-w);opacity:0.85;letter-spacing:0.12em;margin-bottom:0.55rem;text-transform:uppercase;}
-.trial-question{font-family:'Noto Serif SC',serif;font-size:1.02rem;color:var(--text);line-height:1.65;opacity:0.95;margin-bottom:0.7rem;letter-spacing:0.02em;}
-.trial-cta{font-family:'Rajdhani',sans-serif;font-size:0.78rem;color:var(--accent-w);letter-spacing:0.15em;opacity:0.7;transition:transform 0.3s ease,opacity 0.3s ease;}
-.trial-card:hover .trial-cta{transform:translateX(4px);opacity:1;}
+.trial-card:hover{border-color:rgba(201,169,110,0.55);transform:translateY(-3px);box-shadow:0 16px 44px rgba(0,0,0,0.4),0 0 36px rgba(201,169,110,0.14);}
+.trial-card:hover .trial-card-glow{opacity:1;}
+.trial-scene-tag{position:relative;font-family:'Rajdhani','Noto Serif SC',sans-serif;font-size:0.7rem;color:var(--accent-w);opacity:0.85;letter-spacing:0.12em;margin-bottom:0.6rem;text-transform:uppercase;}
+.trial-question{position:relative;font-family:'Noto Serif SC',serif;font-size:1.04rem;color:var(--text);line-height:1.65;opacity:0.96;margin-bottom:0.95rem;letter-spacing:0.02em;}
+/* V20: CTA 按钮化 — 更强引导 */
+.trial-cta{position:relative;display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 1.25rem;background:linear-gradient(135deg,rgba(201,169,110,0.16),rgba(201,169,110,0.06));border:1px solid rgba(201,169,110,0.4);border-radius:2rem;font-family:'Rajdhani',sans-serif;font-size:0.78rem;color:var(--accent-w);letter-spacing:0.16em;transition:all 0.35s var(--ease-out-expo);}
+.trial-cta-arrow{display:inline-block;transition:transform 0.35s var(--ease-out-expo);}
+.trial-card:hover .trial-cta{background:linear-gradient(135deg,rgba(201,169,110,0.28),rgba(201,169,110,0.12));border-color:var(--accent-w);color:var(--text);box-shadow:0 6px 20px rgba(201,169,110,0.2);}
+.trial-card:hover .trial-cta-arrow{transform:translateX(5px);}
 #trialSceneTag,#trialQuestion{transition:opacity 0.28s var(--ease-out-expo);}
 /* V19 R4.1: 试玩提示浮层 */
 .trial-hint{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;display:flex;align-items:center;gap:0.8rem;padding:0.9rem 1.2rem;background:rgba(20,14,10,0.92);border:1px solid rgba(201,169,110,0.35);border-radius:10px;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,0.5),0 0 20px rgba(201,169,110,0.12);max-width:280px;opacity:0;animation:trialHintIn 0.5s var(--ease-out-expo) forwards;}
@@ -120,8 +133,9 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 @media (max-width:600px){.resume-banner{flex-wrap:wrap;max-width:92%;}.resume-btns{width:100%;justify-content:flex-end;}}
 @media (max-width:600px){
   .trial-preview{max-width:92%;margin:0 auto 2rem;}
-  .trial-card{padding:1rem 1.1rem;}
-  .trial-question{font-size:0.95rem;}
+  .trial-card{padding:1.1rem 1.15rem 1.05rem;}
+  .trial-question{font-size:0.96rem;}
+  .trial-cta{padding:0.5rem 1.05rem;font-size:0.74rem;}
 }
 .choice-cards{display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;animation:fadeUp 1.2s ease-out 0.7s both;}
 .choice-card{width:380px;padding:3rem 2rem;background:var(--card-bg);border:1px solid var(--card-border);cursor:pointer;transition:all 0.5s cubic-bezier(0.23,1,0.32,1);position:relative;overflow:hidden;backdrop-filter:blur(10px);}
@@ -144,6 +158,9 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .locked-road::after{display:none;}
 .locked-road .card-era{color:var(--muted) !important;font-size:0.62rem;letter-spacing:0.15em;opacity:0.6;}
 .locked-road .card-icon{opacity:0.35;}
+/* V20: 锁定卡简介 — 「解锁后…」换行突出显示 */
+.locked-road .locked-unlock{display:block;margin-top:0.7rem;padding-top:0.7rem;border-top:1px dashed rgba(201,169,110,0.22);color:var(--accent-w);opacity:0.92;line-height:1.7;font-size:0.82rem;letter-spacing:0.02em;}
+.locked-road p{color:var(--text);opacity:0.78;}
 
 /* INTRO */
 #intro-screen{align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;}

@@ -44,15 +44,21 @@
 </div>
 
 <div class="screen active" id="landing">
+  <div class="landing-eyebrow"><span class="landing-eyebrow-line"></span><span class="landing-eyebrow-text">Interactive Fiction · 权力的剧本</span><span class="landing-eyebrow-line"></span></div>
   <h1>权 力 的 游 戏</h1>
   <p class="subtitle" id="landingSubtitle"></p>
   <div class="divider-line"></div>
   <!-- V19 R4.1: 前期留存钩子 — 试玩预览条(吸引非文字游戏群体) -->
   <div class="trial-preview" id="trialPreview" role="region" aria-label="快速试玩预览">
+    <div class="trial-eyebrow"><span class="trial-eyebrow-dot"></span><span>3 秒试玩 · 无需读档</span></div>
     <div class="trial-card" id="trialCard" role="button" tabindex="0" onclick="startTrialPlay()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();startTrialPlay();}">
+      <div class="trial-card-glow"></div>
       <div class="trial-scene-tag" id="trialSceneTag">凌晨 3:17 · 白宫</div>
       <div class="trial-question" id="trialQuestion">总统来电："现在就签这份授权令。" 你签吗？</div>
-      <div class="trial-cta">点击试玩 →</div>
+      <div class="trial-cta">
+        <span class="trial-cta-text">点击试玩</span>
+        <span class="trial-cta-arrow">→</span>
+      </div>
     </div>
   </div>
   <div class="chaos-entry" id="chaosEntry" style="display:none;" onclick="renderPrelude('chaos')">
@@ -249,10 +255,10 @@
 // V14.3: 隐藏道路解锁状态 — 未解锁时显示锁定占位卡
 (function() {
   var lockInfo = {
-    ai: { hint: '🔒 通关「白宫」或「大明」后解锁', fullText: '共生时代 · 2036年。解锁后：在人类与AI之间搭建信任的桥梁。' },
-    africa: { hint: '🔒 在白宫道路做出「非我族类」的选择', fullText: '非洲之心 · 异星大地。解锁后：成为人类与兽群的双语使者。' },
-    cyber: { hint: '🔒 在AI道路见证一次「觉醒」事件', fullText: '3077 · 赛博贫民窟。解锁后：在机器的世界里守住人性。' },
-    korea: { hint: '🔒 在大明道路按私账融入官场', fullText: '日常投影 · 首尔。解锁后：在咖啡店的日常里，过自己的人生。' },
+    ai: { hint: '🔒 通关「白宫」或「大明」后解锁', fullText: '共生时代 · 2036年。<span class="locked-unlock">解锁后：在人类与AI之间搭建信任的桥梁。</span>' },
+    africa: { hint: '🔒 在白宫道路做出「非我族类」的选择', fullText: '非洲之心 · 异星大地。<span class="locked-unlock">解锁后：成为人类与兽群的双语使者。</span>' },
+    cyber: { hint: '🔒 在AI道路见证一次「觉醒」事件', fullText: '3077 · 赛博贫民窟。<span class="locked-unlock">解锁后：在机器的世界里守住人性。</span>' },
+    korea: { hint: '🔒 在大明道路按私账融入官场', fullText: '日常投影 · 首尔。<span class="locked-unlock">解锁后：在咖啡店的日常里，过自己的人生。</span>' },
   };
   Object.entries(lockInfo).forEach(function(entry) {
     var road = entry[0], info = entry[1];
