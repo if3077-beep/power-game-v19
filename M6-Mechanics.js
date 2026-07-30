@@ -458,12 +458,35 @@ function getScenePowerInsight(scenarioKey, sceneTitle, debtCategory) {
 }
 
 // --- 历史标记系统（事件联动） ---
-let historyFlags = {};
+// V21 [0c]: historyFlags 跨局持久化——修复 CrossPathGenerator 跨道路回响失效
+const CROSS_PLAY_FLAGS_KEY = 'pg_crossPlayFlags_v1';
+let historyFlags = loadCrossPlayFlags();
 
-function setFlag(key, value) { historyFlags[key] = value; }
+function loadCrossPlayFlags() {
+  try {
+    const raw = localStorage.getItem(CROSS_PLAY_FLAGS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function persistCrossPlayFlags() {
+  try { localStorage.setItem(CROSS_PLAY_FLAGS_KEY, JSON.stringify(historyFlags)); }
+  catch (e) { /* 配额满或禁用, 静默降级为内存态 */ }
+}
+function setFlag(key, value) {
+  historyFlags[key] = value;
+  persistCrossPlayFlags();
+}
 function hasFlag(key) { return !!historyFlags[key]; }
 function getFlag(key) { return historyFlags[key]; }
-function resetFlags() { historyFlags = {}; }
+function resetFlags() {
+  // 跨局保留设计: 不再清空。保留签名兼容现有调用点(startGame 的调用已删除)。
+  // 误调用时打警告。
+  console.warn('[historyFlags] resetFlags() is a no-op (cross-play persistence). Use clearCrossPlayFlags() for manual wipe.');
+}
+function clearCrossPlayFlags() {
+  historyFlags = {};
+  persistCrossPlayFlags();
+}
 
 // 根据历史标记修改场景文本/选项
 function applyHistoryEffects(scene, scenarioKey) {
@@ -1369,7 +1392,7 @@ function startGame(scenarioKey) {
   // V14.1: 隐藏道路随机难度 — 40%高强度, 60%普通
   const intensity = isHidden ? (Math.random() < 0.4 ? 'high' : 'normal') : 'normal';
   state = { scenario: scenarioKey, currentScene: 0, debts: [], channels: 5, choices: [], history: [], usedEvents: [], encounterUsed: false, encounterScene: Math.floor(Math.random() * 4) + 2, isHidden, crisisHistory: [], crisisCooldown: 0, crisisStrikes: 0, channelLossCount: 0, extremeChannelTriggered: false, intensity, _brightTheme: state._brightTheme || false, windfallCount: 0, windfallHistory: [] };
-  resetFlags();
+  // V21 [0c]: 不再 resetFlags()——historyFlags 跨局持久化,修复 CrossPathGenerator 跨道路回响
   evo.reset(Date.now() % 2147483647); // V18: 重置演化引擎, 新一局游戏
   // V18 Round 2: 应用校准值到 state
   state.calibration = pendingCalibration || null;
