@@ -222,20 +222,28 @@
     document.body.appendChild(box);
   };
   // DOMContentLoaded 后检查
-  window.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      var failed = window.__moduleCheck();
-      // V20.3: 延长 loader 到水墨开幕动画跑完(1.6s),再淡出衔接 landing 入场
-      var loader = document.getElementById('appLoader');
-      if (loader) { loader.style.opacity = '0'; setTimeout(function(){ if(loader.parentNode) loader.parentNode.removeChild(loader); }, 800); }
-      if (failed.length > 0) {
-        console.error('[ModuleGuard] 加载失败的模块:', failed);
-        window.__showModuleError(failed);
-      } else {
-        console.log('[ModuleGuard] 所有关键模块加载完成 ✓');
-      }
-    }, 1100);
-  });
+  function _dismissLoader(){
+    var loader = document.getElementById('appLoader');
+    if (!loader || loader.dataset.dismissed) return;
+    loader.dataset.dismissed = '1';
+    loader.style.opacity = '0';
+    setTimeout(function(){ if(loader.parentNode) loader.parentNode.removeChild(loader); }, 800);
+  }
+  function _runGuard(){
+    var failed = window.__moduleCheck();
+    _dismissLoader();
+    if (failed.length > 0) {
+      console.error('[ModuleGuard] 加载失败的模块:', failed);
+      window.__showModuleError(failed);
+    } else {
+      console.log('[ModuleGuard] 所有关键模块加载完成 ✓');
+    }
+  }
+  window.addEventListener('DOMContentLoaded', function(){ setTimeout(_runGuard, 1100); });
+  // V21: loader 兜底 — 无论 DOMContentLoaded 是否延迟,load 事件后 1.2s 或硬上限 3.5s 强制淡出
+  // 避免 defer 脚本加载慢时开幕卡死
+  window.addEventListener('load', function(){ setTimeout(_dismissLoader, 1200); });
+  setTimeout(_dismissLoader, 3500);
 })();
 </script>
 <script defer src="analysis-engine.js"></script>
