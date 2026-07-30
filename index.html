@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>权力的游戏 v21.1</title>
+<title>权力的游戏 v21.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700&family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -285,6 +285,8 @@
   }
   landing.classList.add(variant);
   // 抓娃娃机/命运星图:渲染逻辑在下方脚本块定义,延迟到 DOMContentLoaded 后初始化
+  // V21.2: 用 setTimeout(0) 确保在所有 DOMContentLoaded 处理器(含隐藏道路解锁逻辑)之后初始化,
+  //        否则机台会拿到尚未解锁/仍 display:none 的卡片,神秘球检测也会失效
   function _initVariant(){
     if (variant === 'ui-claw' && typeof initClawMachine === 'function') initClawMachine();
     if (variant === 'ui-astro' && typeof initAstroMap === 'function') initAstroMap();
@@ -302,9 +304,13 @@
       }
     } catch(e){}
   }
+  function _deferInit(){
+    // V21.2: 推迟到 DOMContentLoaded 所有同步处理器之后再初始化机台/星图
+    setTimeout(_initVariant, 0);
+  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _initVariant);
-  } else { _initVariant(); }
+    document.addEventListener('DOMContentLoaded', _deferInit);
+  } else { _deferInit(); }
 })();
 </script>
 
@@ -324,9 +330,10 @@
   };
 
   // 抓娃娃机:7 个预设散落位置(百分比,相对机台),按可见球顺序分配
+  // V21.2: y 上移至 44-66 区间,避开底部 hint(bottom:70px)+button(bottom:18px) 控制区
   var CLAW_SLOTS = [
-    { x: 18, y: 62 }, { x: 38, y: 72 }, { x: 58, y: 64 }, { x: 78, y: 74 },
-    { x: 28, y: 80 }, { x: 50, y: 82 }, { x: 70, y: 80 },
+    { x: 16, y: 44 }, { x: 38, y: 52 }, { x: 60, y: 44 }, { x: 82, y: 52 },
+    { x: 26, y: 64 }, { x: 50, y: 66 }, { x: 72, y: 64 },
   ];
 
   window.initClawMachine = function(){
@@ -338,12 +345,24 @@
     // 构建机台
     var machine = document.createElement('div');
     machine.className = 'claw-machine';
+    // V21.2: 多关节爪子 — 吊绳 + 双指,每指 3 节指骨(嵌套),抓取时逐节弯曲
     machine.innerHTML =
       '<div class="claw-marquee">◆ 命 运 抓 取 机 ◆</div>' +
       '<div class="claw-rail"></div>' +
-      '<div class="claw-arm" id="clawArm"><div class="claw-cord" id="clawCord"></div><div class="claw-grip"></div></div>' +
+      '<div class="claw-arm" id="clawArm">' +
+        '<div class="claw-cord" id="clawCord"></div>' +
+        '<div class="claw-grip">' +
+          '<div class="claw-finger left">' +
+            '<span class="claw-phalanx p1"><span class="claw-phalanx p2"><span class="claw-phalanx p3"></span></span></span>' +
+          '</div>' +
+          '<div class="claw-finger right">' +
+            '<span class="claw-phalanx p1"><span class="claw-phalanx p2"><span class="claw-phalanx p3"></span></span></span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
       '<div class="claw-coin-slot"></div>' +
-      '<div class="claw-hint">点球进入 · 或按抓取随机选</div>' +
+      '<div class="claw-hint">点球预选 · 抓取随机选</div>' +
+      '<div class="claw-shard-tray" id="clawShardTray" aria-label="碎片进度"></div>' +
       '<button class="claw-button" id="clawButton">抓 取</button>';
 
     // 插入到 choice-cards 之前
@@ -361,7 +380,55 @@
       machine.appendChild(card);
       visible.push(card);
     });
-    // 分配散落位置(可见球数可能 < 7)
+
+    // V21.2: 集齐碎片机制 — 未解锁的隐藏道路化为「神秘球(❓)」加入机台
+    // 抓到神秘球 +1 碎片,累计 3 碎片直接解锁一个随机未解锁道路(含混沌)
+    var HIDDEN_ROADS = ['ai', 'africa', 'cyber', 'korea']; // chaos 单独判定
+    var lockedRoads = [];
+    HIDDEN_ROADS.forEach(function(r){
+      var cardEl = document.getElementById(r + 'Card');
+      var unlocked = false;
+      try { unlocked = !!(typeof safeStorage !== 'undefined' ? safeStorage.get(r + 'Unlocked') : localStorage.getItem(r + 'Unlocked')); } catch(e) {}
+      // AI 30% 随机免解锁彩蛋:已解锁则不作为神秘球
+      if (!unlocked && cardEl && !cardEl.classList.contains('locked-road')) {
+        // 已被彩蛋解锁(非 locked-road)→ 跳过
+      } else if (!unlocked) {
+        lockedRoads.push(r);
+      }
+    });
+    // chaos 单独判定
+    var chaosUnlocked = false;
+    try { chaosUnlocked = !!(typeof safeStorage !== 'undefined' ? safeStorage.get('chaosUnlocked') : localStorage.getItem('chaosUnlocked')); } catch(e) {}
+    if (!chaosUnlocked) lockedRoads.push('chaos');
+
+    var mysteryBalls = [];
+    var MYSTERY_COLOR = { c:'rgba(184,169,212,0.3)', g:'rgba(184,169,212,0.6)' };
+    // V21.3 it3: 预选目标(点球选中,再按抓取指定抓该球)
+    var selectedTarget = null;
+    lockedRoads.forEach(function(r, idx){
+      var mb = document.createElement('div');
+      mb.className = 'claw-ball claw-mystery';
+      mb.setAttribute('data-mystery', r);
+      mb.setAttribute('role', 'button');
+      mb.setAttribute('tabindex', '0');
+      mb.style.setProperty('--ball-color', MYSTERY_COLOR.c);
+      mb.style.setProperty('--ball-glow', MYSTERY_COLOR.g);
+      mb.innerHTML = '<span class="claw-mystery-icon">❓</span><span class="claw-mystery-name">神秘道路</span>';
+      // V21.3 it3: 点击神秘球预选为抓取目标
+      mb.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (busy) return;
+        if (selectedTarget) selectedTarget.classList.remove('claw-pick');
+        selectedTarget = mb;
+        mb.classList.add('claw-pick');
+        try { audioEngine.play('choice_hover'); } catch(err){}
+      });
+      machine.appendChild(mb);
+      visible.push(mb);
+      mysteryBalls.push(mb);
+    });
+
+    // 分配散落位置(可见球数可能 > 7,循环复用 slot)
     visible.forEach(function(card, i){
       var slot = CLAW_SLOTS[i % CLAW_SLOTS.length];
       card.style.left = slot.x + '%';
@@ -369,6 +436,35 @@
       // 错峰漂浮
       card.style.animationDelay = (i * 0.4) + 's';
     });
+
+    // V21.2: 碎片进度托盘渲染
+    var shardTray = machine.querySelector('#clawShardTray');
+    function getShards(){ try { return parseInt(sessionStorage.getItem('clawShards') || '0', 10) || 0; } catch(e){ return 0; } }
+    function setShards(v){ try { sessionStorage.setItem('clawShards', String(v)); } catch(e){} }
+    function renderShardTray(){
+      if (!shardTray) return;
+      var s = getShards();
+      var dots = '';
+      for (var k = 0; k < 3; k++){ dots += '<span class="claw-shard' + (k < s ? ' on' : '') + '">◆</span>'; }
+      shardTray.innerHTML = '<span class="claw-shard-label">碎片</span>' + dots + '<span class="claw-shard-count">' + s + '/3</span>';
+      shardTray.classList.toggle('active', s > 0);
+    }
+    renderShardTray();
+
+    // V21.2: 解锁一个随机未解锁道路(含 chaos)
+    function unlockRandomRoad(){
+      var stillLocked = [];
+      HIDDEN_ROADS.forEach(function(r){
+        var u = false;
+        try { u = !!(typeof safeStorage !== 'undefined' ? safeStorage.get(r + 'Unlocked') : localStorage.getItem(r + 'Unlocked')); } catch(e) {}
+        if (!u) stillLocked.push(r);
+      });
+      var cu = false;
+      try { cu = !!(typeof safeStorage !== 'undefined' ? safeStorage.get('chaosUnlocked') : localStorage.getItem('chaosUnlocked')); } catch(e) {}
+      if (!cu) stillLocked.push('chaos');
+      if (!stillLocked.length) return null;
+      return stillLocked[Math.floor(Math.random() * stillLocked.length)];
+    }
 
     // 抓取动画 + 音效
     var arm = machine.querySelector('#clawArm');
@@ -378,17 +474,24 @@
     btn.addEventListener('click', function(){
       if (busy) return;
       busy = true; btn.disabled = true;
-      // 投币音
+      // V21.3 it2: 投币动画 + 投币音
       try { audioEngine.play('coin'); } catch(e){}
-      // 随机选一个可见球作为目标
-      var target = visible[Math.floor(Math.random() * visible.length)];
+      var coinDrop = document.createElement('div');
+      coinDrop.className = 'claw-coin-drop';
+      machine.appendChild(coinDrop);
+      setTimeout(function(){ if (coinDrop.parentNode) coinDrop.parentNode.removeChild(coinDrop); }, 700);
+      // 随机选一个可见球作为目标,或使用预选目标
+      var target = selectedTarget || visible[Math.floor(Math.random() * visible.length)];
+      if (selectedTarget) { selectedTarget.classList.remove('claw-pick'); selectedTarget = null; }
       var targetLeft = parseFloat(target.style.left);
       var targetTop = parseFloat(target.style.top);
+      var isMystery = target.classList.contains('claw-mystery');
       // 1. 爪子移到目标正上方(轨道 top 16px, 用 left% 定位)
       arm.style.left = targetLeft + '%';
       target.classList.add('claw-target');
-      // 2. 下降(cord 高度 = 球 top - 轨道)+ 机械音
-      var dropH = (targetTop / 100) * 480 - 16;
+      // 2. 下降(cord 高度 = 球 top - 轨道)+ 机械音; V21.2: 用机台实际高度,修复移动端写死 480 的 bug
+      var machH = machine.offsetHeight || 480;
+      var dropH = (targetTop / 100) * machH - 16;
       setTimeout(function(){ cord.style.height = dropH + 'px'; arm.classList.add('claw-grabbing'); try { audioEngine.play('claw_drop'); } catch(e){} }, 650);
       // 3. 闭合 + 咬合音
       setTimeout(function(){ arm.classList.remove('claw-grabbing'); arm.classList.add('claw-closed'); try { audioEngine.play('claw_grab'); } catch(e){} }, 1250);
@@ -399,14 +502,92 @@
         // 庆祝粒子
         spawnClawConfetti(machine, target);
       }, 1700);
-      // 5. 提示该球高亮,2.9s 后触发进入
+      // 5. 提示该球高亮,2.9s 后判定
       setTimeout(function(){
         arm.classList.remove('claw-closed');
         target.classList.remove('claw-target');
-        // 模拟点击进入该道路
-        target.click();
-        busy = false; btn.disabled = false;
+        if (isMystery) {
+          // V21.2: 神秘球 → 集齐碎片,3 碎片解锁
+          var s = getShards() + 1;
+          setShards(s);
+          renderShardTray();
+          // V21.3 it2: 碎片飞向托盘动画
+          spawnShardFly(machine, target, shardTray);
+          // 神秘球碎裂特效
+          target.classList.add('claw-shatter');
+          try { audioEngine.play('claw_grab'); } catch(e){}
+          if (s >= 3) {
+            // 集齐!解锁一个随机未解锁道路
+            var unlockRoad = unlockRandomRoad();
+            setShards(0);
+            renderShardTray();
+            setTimeout(function(){
+              showClawUnlockOverlay(unlockRoad);
+            }, 600);
+            busy = false; btn.disabled = false;
+          } else {
+            // 提示碎片进度
+            showClawShardToast(s);
+            // 移除已抓的神秘球
+            setTimeout(function(){ if (target.parentNode) target.parentNode.removeChild(target); visible.splice(visible.indexOf(target), 1); }, 500);
+            busy = false; btn.disabled = false;
+          }
+        } else {
+          // 普通球 → 模拟点击进入该道路
+          target.click();
+          busy = false; btn.disabled = false;
+        }
       }, 2900);
+    });
+  };
+
+  // V21.2: 碎片进度 toast 提示
+  function showClawShardToast(shards){
+    var t = document.createElement('div');
+    t.className = 'claw-shard-toast';
+    t.innerHTML = '<span class="cst-icon">◆</span> 集齐碎片 <span class="cst-count">' + shards + '/3</span>';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add('show'); });
+    setTimeout(function(){ t.classList.remove('show'); setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 500); }, 1800);
+  }
+
+  // V21.2: 集齐碎片解锁弹层
+  function showClawUnlockOverlay(road){
+    var ROAD_NAMES = { ai:'共生时代', africa:'非洲之心', cyber:'3077 赛博', korea:'日常投影', chaos:'时空之渊' };
+    var ROAD_ICONS = { ai:'🤖', africa:'🌍', cyber:'⚡', korea:'🌸', chaos:'🌀' };
+    var name = ROAD_NAMES[road] || '隐藏道路';
+    var icon = ROAD_ICONS[road] || '✨';
+    // 写入解锁状态
+    try {
+      if (road === 'chaos') { if (typeof safeStorage !== 'undefined') safeStorage.set('chaosUnlocked', 'true'); else localStorage.setItem('chaosUnlocked', 'true'); }
+      else { if (typeof safeStorage !== 'undefined') safeStorage.set(road + 'Unlocked', 'true'); else localStorage.setItem(road + 'Unlocked', 'true'); }
+    } catch(e) {}
+    var ov = document.createElement('div');
+    ov.className = 'claw-unlock-overlay';
+    ov.innerHTML =
+      '<div class="claw-unlock-card">' +
+        '<div class="claw-unlock-icon">' + icon + '</div>' +
+        '<div class="claw-unlock-title">集齐三枚碎片</div>' +
+        '<div class="claw-unlock-name">' + name + '</div>' +
+        '<div class="claw-unlock-sub">隐藏道路已解锁</div>' +
+        '<button class="claw-unlock-btn">继续</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){ ov.classList.add('show'); });
+    try { audioEngine.play('claw_win'); } catch(e){}
+    ov.querySelector('.claw-unlock-btn').addEventListener('click', function(){
+      ov.classList.remove('show');
+      setTimeout(function(){ if (ov.parentNode) ov.parentNode.removeChild(ov); }, 500);
+      // 刷新 landing 卡片解锁状态
+      try { if (typeof initLanding === 'function') initLanding(); } catch(e){}
+      // 重新初始化机台以更新神秘球
+      try {
+        var landing = document.getElementById('landing');
+        if (landing && landing.classList.contains('ui-claw') && typeof initClawMachine === 'function') {
+          landing.querySelectorAll('.claw-machine').forEach(function(el){ el.remove(); });
+          initClawMachine();
+        }
+      } catch(e){}
     });
   };
 
@@ -432,6 +613,27 @@
     }
   }
 
+  // V21.3 it2: 碎片飞向托盘
+  function spawnShardFly(machine, ball, tray){
+    if (!tray) return;
+    var mRect = machine.getBoundingClientRect();
+    var bRect = ball.getBoundingClientRect();
+    var tRect = tray.getBoundingClientRect();
+    var startX = bRect.left + bRect.width/2 - mRect.left;
+    var startY = bRect.top + bRect.height/2 - mRect.top;
+    var endX = tRect.left + tRect.width/2 - mRect.left;
+    var endY = tRect.top + tRect.height/2 - mRect.top;
+    var fly = document.createElement('div');
+    fly.className = 'claw-shard-fly';
+    fly.textContent = '◆';
+    fly.style.left = startX + 'px';
+    fly.style.top = startY + 'px';
+    fly.style.setProperty('--fx', (endX - startX) + 'px');
+    fly.style.setProperty('--fy', (endY - startY) + 'px');
+    machine.appendChild(fly);
+    setTimeout(function(){ if (fly.parentNode) fly.parentNode.removeChild(fly); }, 750);
+  }
+
   // 命运星图:星点散落 + SVG 连线
   var ASTRO_SLOTS = [
     { x: 22, y: 28 }, { x: 50, y: 18 }, { x: 78, y: 30 },
@@ -455,6 +657,8 @@
     map.insertAdjacentHTML('beforeend', '<div class="astro-caption">— 命运的星图,由你点亮 —</div>');
     // V21: 流星
     map.insertAdjacentHTML('beforeend', '<div class="astro-meteor"></div>');
+    // V21.3 it2: 第二颗流星(不同起点/时序,增加星空动感)
+    map.insertAdjacentHTML('beforeend', '<div class="astro-meteor astro-meteor-2"></div>');
 
     var cardsWrap = landing.querySelector('.choice-cards');
     cardsWrap.parentNode.insertBefore(map, cardsWrap);
@@ -471,6 +675,12 @@
       var icon = card.querySelector('.card-icon');
       var h2 = card.querySelector('h2');
       var era = card.querySelector('.card-era');
+      var pEl = card.querySelector('p');
+      // V21.2: 重组前保存 <p> 描述与 era 文本到 dataset,切换还原时读回(修复"只有标题"丢描述 bug)
+      try {
+        card.dataset.origDesc = pEl ? pEl.innerHTML : '';
+        card.dataset.origEra = era ? era.textContent : '';
+      } catch(e) {}
       var core = document.createElement('div');
       core.className = 'astro-star-core';
       if (icon) core.appendChild(icon);
@@ -559,13 +769,17 @@
         var eraEl = card.querySelector('.astro-era');
         if (nameEl || coreEl || eraEl) {
           var icon = coreEl ? coreEl.querySelector('.card-icon') : null;
-          var eraText = eraEl ? eraEl.textContent : '';
+          var eraText = (card.dataset && card.dataset.origEra) ? card.dataset.origEra : (eraEl ? eraEl.textContent : '');
           var nameText = nameEl ? nameEl.textContent : '';
+          var descHTML = (card.dataset && card.dataset.origDesc) ? card.dataset.origDesc : '';
           while (card.firstChild) card.removeChild(card.firstChild);
           var atm = document.createElement('div'); atm.className = 'card-atmosphere'; card.appendChild(atm);
           if (icon) card.appendChild(icon);
           if (eraText) { var e = document.createElement('div'); e.className = 'card-era'; e.textContent = eraText; card.appendChild(e); }
           if (nameText) { var h = document.createElement('h2'); h.textContent = nameText; card.appendChild(h); }
+          // V21.2: 还原 <p> 描述(此前丢失导致"只有标题")
+          if (descHTML) { var p = document.createElement('p'); p.innerHTML = descHTML; card.appendChild(p); }
+          try { delete card.dataset.origDesc; delete card.dataset.origEra; } catch(err) {}
         }
       }
       if (cardsWrap) cardsWrap.appendChild(card);

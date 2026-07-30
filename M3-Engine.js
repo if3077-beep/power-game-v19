@@ -35,6 +35,36 @@ window.addEventListener('resize', () => {
 let channelBarTimer = null;
 // V18 Round 3: throttle scroll (节流 ~16ms ≈ 60fps 上限) — 用 rAF 节流
 let _scrollTicking = false;
+// V21.2: 悬浮继续按钮 — 滚动时隐藏,静止后迅速出现
+let _floatingBtn = null;
+let _floatingScrollTimer = null;
+function _ensureFloatingBtn() {
+  if (_floatingBtn && document.body.contains(_floatingBtn)) return _floatingBtn;
+  _floatingBtn = document.createElement('button');
+  _floatingBtn.className = 'floating-continue-btn';
+  _floatingBtn.setAttribute('aria-label', '继续');
+  _floatingBtn.innerHTML = '<span class="fc-text">继续</span><span class="fc-arrow">→</span>';
+  document.body.appendChild(_floatingBtn);
+  return _floatingBtn;
+}
+window.showFloatingContinue = function(label, onClick, opts) {
+  const btn = _ensureFloatingBtn();
+  btn.querySelector('.fc-text').textContent = label || '继续';
+  btn.onclick = function(e) {
+    if (typeof createRipple === 'function') createRipple(e, btn);
+    window.hideFloatingContinue();
+    if (typeof onClick === 'function') setTimeout(onClick, 120);
+  };
+  btn.classList.remove('hide');
+  requestAnimationFrame(function() { btn.classList.add('show'); });
+  if (opts && opts.persist) btn.dataset.persist = '1'; else delete btn.dataset.persist;
+};
+window.hideFloatingContinue = function() {
+  if (!_floatingBtn) return;
+  _floatingBtn.classList.remove('show');
+  _floatingBtn.classList.add('hide');
+  delete _floatingBtn.dataset.persist;
+};
 window.addEventListener('scroll', () => {
   if (_scrollTicking) return;
   _scrollTicking = true;
@@ -44,6 +74,12 @@ window.addEventListener('scroll', () => {
       bar.classList.add('visible');
       clearTimeout(channelBarTimer);
       channelBarTimer = setTimeout(() => { bar.classList.remove('visible'); }, 1500);
+    }
+    // V21.2: 悬浮继续按钮滚动时隐藏,静止后迅速出现
+    if (_floatingBtn && _floatingBtn.classList.contains('show')) {
+      _floatingBtn.classList.add('scroll-hide');
+      clearTimeout(_floatingScrollTimer);
+      _floatingScrollTimer = setTimeout(() => { _floatingBtn.classList.remove('scroll-hide'); }, 220);
     }
     _scrollTicking = false;
   });
@@ -669,6 +705,8 @@ let unlockedEndings = (function(){ try { return JSON.parse(localStorage.getItem(
 
 // --- 屏幕切换 ---
 function showScreen(id) {
+  // V21.2: 离开游戏屏时隐藏悬浮继续按钮
+  if (id !== 'game-screen' && window.hideFloatingContinue) window.hideFloatingContinue();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'game-screen') {
@@ -697,6 +735,8 @@ function showScreen(id) {
 
 // --- 转场 ---
 function transition(callback) {
+  // V21.2: 切屏前隐藏悬浮继续按钮(避免残留下个场景)
+  if (window.hideFloatingContinue) window.hideFloatingContinue();
   const overlay = document.getElementById('transitionOverlay');
   // V20 R9: 注入水墨晕染层(仅一次)
   if (!overlay.querySelector('.ink-bloom')) {

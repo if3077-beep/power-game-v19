@@ -2825,18 +2825,11 @@ function makeChoice(index) {
   }, 100);
 
   setTimeout(() => {
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'choice-btn';
-    nextBtn.style.marginTop = '2rem';
-    nextBtn.style.opacity = '0';
-    // V20 R6: 试玩模式 — 第2次选择后按钮变为"结束试玩"
-    if (state._isTrial && state.choices.length >= 2) {
-      nextBtn.innerHTML = '结束试玩 · 回到首页';
-    } else {
-      nextBtn.innerHTML = state.currentScene < sc.scenes.length - 1 ? '继续' : '查看结局';
-    }
-    nextBtn.onclick = (e) => {
-      createRipple(e, nextBtn);
+    // V21.2: 继续按钮改为悬浮式(滚动隐藏/静止出现),玩家做完选项即出现
+    let _label = '继续';
+    if (state._isTrial && state.choices.length >= 2) _label = '结束试玩 · 回到首页';
+    else _label = state.currentScene < sc.scenes.length - 1 ? '继续' : '查看结局';
+    window.showFloatingContinue(_label, () => {
       // V20 R6: 试玩模式限制 — 做完 2 次选择后,展示结束提示并回主页
       if (state._isTrial && state.choices.length >= 2) {
         setTimeout(() => endTrialPlay(), 300);
@@ -2880,8 +2873,9 @@ function makeChoice(index) {
           transition(() => showEnding());
         }
       }, 300);
-    };
-    container.appendChild(nextBtn);
+    });
+    // 切屏前隐藏悬浮按钮(避免残留在下个场景)
+    window._fcCleanup = () => window.hideFloatingContinue();
 
     // V20 R6.1: 「继续做梦」— 概率下调至 10%(每局最多一次,场景3+触发)
     if (!state._isTrial && !state._dreamOffered && !state.isHidden
@@ -2925,8 +2919,6 @@ function makeChoice(index) {
         setTimeout(() => { earlyBtn.style.transition = 'all 0.5s ease'; earlyBtn.style.opacity = '1'; }, 200);
       }
     }
-
-    setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
   }, 2000);
 }
 
@@ -3799,17 +3791,10 @@ function renderRandomEvent() {
             }, 100);
 
             setTimeout(() => {
-              const nextBtn = document.createElement('button');
-              nextBtn.className = 'choice-btn';
-              nextBtn.style.marginTop = '2rem';
-              nextBtn.style.opacity = '0';
-              nextBtn.innerHTML = '继续';
-              nextBtn.onclick = (e) => {
-                createRipple(e, nextBtn);
+              // V21.2: 悬浮继续按钮
+              window.showFloatingContinue('继续', () => {
                 setTimeout(() => transition(() => renderScene()), 300);
-              };
-              container.appendChild(nextBtn);
-              setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
+              });
             }, 1500);
           };
           choicesEl.appendChild(btn);
@@ -3925,13 +3910,8 @@ function renderEncounter() {
         }, 100);
         // 继续按钮
         setTimeout(() => {
-          const nextBtn = document.createElement('button');
-          nextBtn.className = 'choice-btn';
-          nextBtn.style.marginTop = '2rem';
-          nextBtn.style.opacity = '0';
-          nextBtn.innerHTML = '继续';
-          nextBtn.onclick = (ev) => {
-            createRipple(ev, nextBtn);
+          // V21.2: 悬浮继续按钮
+          window.showFloatingContinue('继续', () => {
             startBGM(state.scenario);
             setTimeout(() => {
               if (state.currentScene < sc.scenes.length - 1) {
@@ -3957,9 +3937,7 @@ function renderEncounter() {
                 transition(() => showEnding());
               }
             }, 300);
-          };
-          container.appendChild(nextBtn);
-          setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
+          });
         }, 2000);
       };
       choicesEl.appendChild(btn);
@@ -4052,18 +4030,11 @@ function renderChannelCrisis(event) {
             }, 100);
 
             setTimeout(() => {
-              const nextBtn = document.createElement('button');
-              nextBtn.className = 'choice-btn';
-              nextBtn.style.marginTop = '2rem';
-              nextBtn.style.opacity = '0';
-              nextBtn.innerHTML = '继续';
-              nextBtn.onclick = (e) => {
-                createRipple(e, nextBtn);
+              // V21.2: 悬浮继续按钮
+              window.showFloatingContinue('继续', () => {
                 startBGM(state.scenario);
                 setTimeout(() => transition(() => renderScene()), 300);
-              };
-              container.appendChild(nextBtn);
-              setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
+              });
             }, 1500);
           };
           choicesEl.appendChild(btn);
@@ -4158,17 +4129,10 @@ function renderChannelWindfall(event) {
             }, 100);
 
             setTimeout(() => {
-              const nextBtn = document.createElement('button');
-              nextBtn.className = 'choice-btn';
-              nextBtn.style.marginTop = '2rem';
-              nextBtn.style.opacity = '0';
-              nextBtn.innerHTML = '继续';
-              nextBtn.onclick = (e) => {
-                createRipple(e, nextBtn);
+              // V21.2: 悬浮继续按钮
+              window.showFloatingContinue('继续', () => {
                 setTimeout(() => transition(() => renderScene()), 300);
-              };
-              container.appendChild(nextBtn);
-              setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
+              });
             }, 1500);
           };
           choicesEl.appendChild(btn);
@@ -4533,17 +4497,10 @@ function renderFinalEvent() {
             }, 100);
 
             setTimeout(() => {
-              const nextBtn = document.createElement('button');
-              nextBtn.className = 'choice-btn';
-              nextBtn.style.marginTop = '2rem';
-              nextBtn.style.opacity = '0';
-              nextBtn.innerHTML = '踏入终章';
-              nextBtn.onclick = (e) => {
-                createRipple(e, nextBtn);
+              // V21.2: 悬浮继续按钮
+              window.showFloatingContinue('踏入终章', () => {
                 setTimeout(() => transition(() => renderScene()), 300);
-              };
-              container.appendChild(nextBtn);
-              setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
+              });
             }, 1500);
           };
           choicesEl.appendChild(btn);
@@ -5498,21 +5455,16 @@ function renderDream() {
             container.appendChild(conEl);
             setTimeout(() => { conEl.style.transition = 'all 0.8s cubic-bezier(0.23,1,0.32,1)'; conEl.style.opacity = '1'; conEl.style.transform = 'translateY(0)'; }, 100);
             setTimeout(() => {
-              const nxt = document.createElement('button');
-              nxt.className = 'choice-btn dream-btn';
-              nxt.style.marginTop = '2rem'; nxt.style.opacity = '0';
-              nxt.innerHTML = (idx + 1 < DREAM_SEQUENCES.length) ? '梦更深一层' : '从梦中醒来';
-              nxt.onclick = (e) => {
-                createRipple(e, nxt);
+              // V21.2: 悬浮继续按钮(梦境)
+              const _dreamLabel = (idx + 1 < DREAM_SEQUENCES.length) ? '梦更深一层' : '从梦中醒来';
+              window.showFloatingContinue(_dreamLabel, () => {
                 if (idx + 1 < DREAM_SEQUENCES.length) {
                   state._dreamIndex = idx + 1;
                   setTimeout(() => transition(() => renderDream()), 300);
                 } else {
                   setTimeout(() => transition(() => renderScene()), 300);
                 }
-              };
-              container.appendChild(nxt);
-              setTimeout(() => { nxt.style.transition = 'all 0.5s ease'; nxt.style.opacity = '1'; }, 100);
+              });
             }, 1800);
           };
           choicesEl.appendChild(btn);
