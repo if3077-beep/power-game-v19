@@ -473,15 +473,15 @@ function applyHistoryEffects(scene, scenarioKey) {
   if (scenarioKey === 'whitehouse') {
     // 如果第一关选择了处理推文（民意优先），后面的媒体风暴场景加一句提醒
     if (hasFlag('wh_chose_public_op') && modified.title === '媒体风暴') {
-      modified.text += '\n\n你想起了上次因为民意而搁置情报的事。这次，你不能再犯同样的错误——或者，你已经习惯了？';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '你想起了上次因为民意而搁置情报的事。这次，你不能再犯同样的错误——或者，你已经习惯了？';
     }
     // 如果第一关选了委派，幕僚长的信任成本在后面体现
     if (hasFlag('wh_delegated') && modified.title === '幕僚背叛') {
-      modified.text += '\n\n你忽然想起，你已经不是第一次把难题推给别人了。也许这就是为什么他开始为自己留后路。';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '你忽然想起，你已经不是第一次把难题推给别人了。也许这就是为什么他开始为自己留后路。';
     }
     // 如果在内阁会议中沉默，后面派系拉拢时有人提起
     if (hasFlag('wh_silent_cabinet') && modified.title === '派系拉拢') {
-      modified.text += '\n\n参议院领袖开门见山："上次内阁会议你的沉默，让很多人猜了三天。我今天来，就是想听你一个准话。"';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '参议院领袖开门见山："上次内阁会议你的沉默，让很多人猜了三天。我今天来，就是想听你一个准话。"';
     }
     // V10: 支线 — 如果连续利己，在危机表态时增加一个特殊选项
     if (hasFlag('wh_chose_public_op') && hasFlag('wh_delegated') && modified.title === '危机表态') {
@@ -501,19 +501,19 @@ function applyHistoryEffects(scene, scenarioKey) {
   if (scenarioKey === 'ming') {
     // 如果收了金元宝，后面断案时王员外更有恃无恐
     if (hasFlag('ming_accepted_gold') && modified.title === '土地之争') {
-      modified.text += '\n\n你想起了那锭金元宝。王员外之所以敢如此嚣张，正是因为他知道——你收过他的东西。';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '你想起了那锭金元宝。王员外之所以敢如此嚣张，正是因为他知道——你收过他的东西。';
     }
     // 如果按官账上报，后面民变时上司不帮你
     if (hasFlag('ming_followed_rules') && modified.title === '民变前夜') {
-      modified.text += '\n\n你想起刚到任时按官账上报的事。上司至今没有原谅你。这次，他不会派人来帮你。';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '你想起刚到任时按官账上报的事。上司至今没有原谅你。这次，他不会派人来帮你。';
     }
     // 如果在酒局上沉默，后面站队时信息更少
     if (hasFlag('ming_silent_at_feast') && modified.title === '派系抉择') {
-      modified.text += '\n\n你想起酒局上的沉默。你错过了获取情报的最佳机会。现在，你对朝廷的局势一无所知。';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '你想起酒局上的沉默。你错过了获取情报的最佳机会。现在，你对朝廷的局势一无所知。';
     }
     // V10: 支线 — 如果收了金元宝且按私账来，民变时王员外来信更具体
     if (hasFlag('ming_accepted_gold') && hasFlag('ming_followed_private') && modified.title === '民变前夜') {
-      modified.text += '\n\n王员外的信比平时更直白："贤侄，这些人是冲着你我来的。你帮我压下去，我在京城替你活动。"';
+      modified._appendedText = (modified._appendedText ? modified._appendedText + '\n\n' : '') + '王员外的信比平时更直白："贤侄，这些人是冲着你我来的。你帮我压下去，我在京城替你活动。"';
       modified.choices.push({
         text: '和王员外联手——用他的势力弹压佃户',
         hint: '你已经深陷这张网。弹压能换来安稳，但你的良心呢？',
@@ -1530,6 +1530,12 @@ function renderScene() {
   if (scene.textVariants && scene.textVariants.length > 0) {
     const allTexts = [scene.text, ...scene.textVariants];
     scene.text = allTexts[Math.floor(Math.random() * allTexts.length)];
+  }
+
+  // V21 [0b]: applyHistoryEffects 的追加文本走独立字段,不进 textVariants 随机池
+  // 避免历史联动文本与变体文本互斥覆盖(此前 50% 概率丢失联动)
+  if (scene._appendedText) {
+    scene.text = scene.text + '\n\n' + scene._appendedText;
   }
   // V14.3: narratorVariants 30%概率替换（判定理念不每次都出现）
   if (scene.narratorVariants && scene.narratorVariants.length > 0 && Math.random() < 0.3) {
