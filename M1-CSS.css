@@ -194,6 +194,14 @@ body.theme-korea .intro-desc, body.theme-korea .intro-situation{line-height:2.4;
 .channels-bar .ch-dot{width:10px;height:10px;border-radius:50%;background:var(--success);transition:all 0.5s;}
 .channels-bar .ch-dot.lost{background:var(--danger);opacity:0.3;transform:scale(0.7);}
 .channels-bar .ch-status{font-size:0.7rem;color:var(--muted);font-style:italic;}
+/* V20 R13: 移动端渠道圆饼 — 常驻环形指示器 */
+.ch-ring{display:none;position:fixed;top:4.2rem;right:0.9rem;width:46px;height:46px;z-index:100;align-items:center;justify-content:center;pointer-events:none;}
+.ch-ring-svg{width:100%;height:100%;transform:rotate(-90deg);}
+.ch-ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:3.2;}
+.ch-ring-fg{fill:none;stroke:var(--success);stroke-width:3.2;stroke-linecap:round;stroke-dasharray:97.4;stroke-dashoffset:97.4;transition:stroke-dashoffset 0.6s var(--ease-out-expo),stroke 0.4s ease;}
+.ch-ring-val{position:absolute;font-family:'Rajdhani',sans-serif;font-size:0.92rem;font-weight:600;color:var(--text);line-height:1;}
+.ch-ring.low .ch-ring-fg{stroke:var(--danger);}
+.ch-ring.low .ch-ring-val{color:var(--danger);}
 
 /* GAME LAYOUT */
 .game-layout{display:flex;min-height:100vh;padding-top:5.5rem;}
@@ -581,6 +589,9 @@ body.theme-chaos .gallery-card.unlocked:hover{box-shadow:0 12px 40px rgba(0,0,0,
   .channels-bar{padding:0.4rem 0.8rem;top:auto;margin-top:0.3rem;}
   .channels-bar .ch-label{font-size:0.55rem;}
   .channels-bar .ch-status{font-size:0.6rem;}
+  /* V20 R13: 移动端用圆饼常驻显示,隐藏点阵/标签/状态(节省空间) */
+  .ch-ring{display:flex;}
+  .channels-bar .ch-label,.channels-bar .ch-dots,.channels-bar .ch-status{display:none;}
 }
 
 /* ====== V7: 涟漪效果 ====== */

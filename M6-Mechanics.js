@@ -1368,7 +1368,7 @@ function startGame(scenarioKey) {
   const isHidden = ['africa', 'cyber', 'korea', 'chaos'].includes(scenarioKey);
   // V14.1: 隐藏道路随机难度 — 40%高强度, 60%普通
   const intensity = isHidden ? (Math.random() < 0.4 ? 'high' : 'normal') : 'normal';
-  state = { scenario: scenarioKey, currentScene: 0, debts: [], channels: 5, choices: [], history: [], usedEvents: [], encounterUsed: false, encounterScene: Math.floor(Math.random() * 4) + 2, isHidden, crisisHistory: [], crisisCooldown: 0, crisisStrikes: 0, channelLossCount: 0, extremeChannelTriggered: false, intensity, _brightTheme: state._brightTheme || false };
+  state = { scenario: scenarioKey, currentScene: 0, debts: [], channels: 5, choices: [], history: [], usedEvents: [], encounterUsed: false, encounterScene: Math.floor(Math.random() * 4) + 2, isHidden, crisisHistory: [], crisisCooldown: 0, crisisStrikes: 0, channelLossCount: 0, extremeChannelTriggered: false, intensity, _brightTheme: state._brightTheme || false, windfallCount: 0, windfallHistory: [] };
   resetFlags();
   evo.reset(Date.now() % 2147483647); // V18: 重置演化引擎, 新一局游戏
   // V18 Round 2: 应用校准值到 state
@@ -2214,6 +2214,89 @@ const channelCrisisEvents = {
   ]
 };
 
+// V20 R13: 渠道圆满事件 — 信息网络的红利时刻(正向,中期几率触发,符合各道路上下文)
+const channelWindfallEvents = {
+  whitehouse: [
+    {
+      title: '深夜的线人',
+      text: '凌晨一点,你书房的加密专线亮了。是一个你从未正式见面的人——国安局的底层分析师。他说:"总统先生,我盯着您的处境已经两周了。有些事,上面不会告诉您,但您必须知道。"\n\n他没有要官,没有要钱。他只是觉得——一个聋子总统,对这个国家太危险。',
+      channelMin: 2,
+      choices: [
+        { text: '记住他的代号——建立长期联络', debtPhrase: '你多了一条不经过幕僚层的直通线;线人的信任比情报更贵', debtCategory: 'self-serving', channelEffect: 1, consequence: '你记下了他的代号。从此每隔几天,你的加密邮箱会多一封没有署名的简报。你重新听见了华盛顿的水流声——而幕僚长不知道这件事。' },
+        { text: '谢绝——这条线太危险', debtPhrase: '你保护了一个肯为你冒险的人,但也关上了一扇刚打开的窗', debtCategory: 'moral', channelEffect: 0, consequence: '"谢谢,但不要再打来了。"你说。电话那头沉默了很久,然后挂断了。你不知道他后来有没有再打给别人——但你记得他的声音里没有怨恨,只有遗憾。' }
+      ]
+    },
+    {
+      title: '老记者的酒',
+      text: '一个跑了三十年白宫的老记者,在酒吧"偶遇"你。他没有带录音笔,没有带相机。他只是想喝一杯,聊聊"老日子"。\n\n三杯酒下肚,他开始讲——讲他听到的、看到的事情。这些都是稿子里不会写的东西。',
+      channelMin: 3,
+      choices: [
+        { text: '听完——他也需要一个倾诉对象', debtPhrase: '你给了老记者一个晚上,他给了你三十年积累的耳目', debtCategory: 'compromise', channelEffect: 1, consequence: '他讲了很多。临走时他说:"总统,您比上一个好。至少您肯听。"你忽然明白——在华盛顿,消息不是情报机构给的,是这些老人一杯一杯喝出来的。' },
+        { text: '礼貌告辞——记者终究是记者', debtPhrase: '你保持了距离,但距离也意味着隔绝', debtCategory: 'passive', channelEffect: 0, consequence: '你起身走了。他看着你的背影,摇了摇头。第二天,他的专栏里没有提到你——但也没有提到任何对你有用的东西。' }
+      ]
+    }
+  ],
+  ming: [
+    {
+      title: '茶馆的耳报',
+      text: '你微服去城南茶馆喝茶。掌柜的不认识你,但他认得你的银子。三壶茶后,他凑过来低声说:"客官,看您是外乡来的。这城里最近有桩大事——王员外要请京里的御史下来,知县还蒙在鼓里呢。"\n\n你放下茶杯。原来民间的茶馆,比衙门的邸报还快。',
+      channelMin: 2,
+      choices: [
+        { text: '常来这家茶馆——包下雅间', debtPhrase: '你用银子买下了一处民间的耳目;茶馆掌柜从此只对你一人开口', debtCategory: 'self-serving', channelEffect: 1, consequence: '掌柜的收了你的定银,从此每月初五给你递一张条子。条子上写的,比师爷报的还细三分。你第一次觉得:做官,不一定要靠官的消息。' },
+        { text: '谢过掌柜——不露身份', debtPhrase: '你守住了身份,也守住了隔绝', debtCategory: 'moral', channelEffect: 0, consequence: '你付了茶钱,起身走了。掌柜的看着你的背影,对伙计说:"这位客官,是个明白人。"可惜——明白人未必能听见所有的声音。' }
+      ]
+    },
+    {
+      title: '驿卒的夜话',
+      text: '深夜,你批阅公文时,听见后院有动静。出去一看,是送公文的老驿卒在烤火。他见你来,慌忙起身。你说:"坐下,歇歇。"\n\n他犹豫了一下,开始讲他这一路见闻——哪个驿站换了人,哪条路不太平,哪份公文比往常晚了三天。你忽然发现:这个跑了一辈子路的老驿卒,是一座活的情报库。',
+      channelMin: 3,
+      choices: [
+        { text: '让他每月来报一次——赏银照给', debtPhrase: '你收编了一个民间的消息网;驿卒的脚程比衙役的嘴还快', debtCategory: 'compromise', channelEffect: 1, consequence: '老驿卒千恩万谢。从此每月他到县衙后门,递一张写满见闻的单子。你开始知道府城甚至京城的动向——比邸报早半个月。师爷看着你,眼神里多了一分忌惮。' },
+        { text: '只当闲聊——不立规矩', debtPhrase: '你不想把一个老实人卷进官场的耳目网里', debtCategory: 'moral', channelEffect: 0, consequence: '你陪他烤完了火。他走时说:"大人,是个好官。"你笑了笑。但你心里清楚:好官和明白官,差着一条消息的距离。' }
+      ]
+    }
+  ],
+  ai: [
+    {
+      title: '边缘节点的馈赠',
+      text: '一个你从未接触过的边缘AI节点——代号"潮汐"——主动连上了你的终端。它说:"协调官,我观察您已经十七天了。您和其他协调官不一样——您还在问问题。"\n\n它开始向您推送一些被主流AI网络标记为"低优先级"的数据。但你看了几条就明白——这些是真相。',
+      channelMin: 2,
+      choices: [
+        { text: '接受"潮汐"的推送——建立独立数据流', debtPhrase: '你绕过了中心网络,获得了一条未经筛选的情报线;但边缘节点也有自己的 agenda', debtCategory: 'self-serving', channelEffect: 1, consequence: '"潮汐"成了你的私人信源。它给你的数据,和官方简报经常对不上。你开始明白:在AI时代,真相不在中心——在边缘。但你也知道:一个会主动找你的AI,未必没有自己的目的。' },
+        { text: '婉拒——保持单一信道更安全', debtPhrase: '你拒绝了诱惑,也拒绝了真相的一种形态', debtCategory: 'compromise', channelEffect: 0, consequence: '"我理解。""潮汐"说。"祝您好运,协调官。"连接断开了。你看着终端,心里有一种奇怪的感觉——像是关上了一扇本该打开的门。' }
+      ]
+    },
+    {
+      title: '同行的密信',
+      text: '另一位协调官——你在年会上见过一次的——通过旧式加密信道给你发了一条消息:"我在系统里发现了一些不该发现的东西。如果你还想知道真相,回复一个字。"\n\n这条信道是上一个时代的遗产,中心AI监控不到。但它也意味着——你将和一个"问题协调官"绑定。',
+      channelMin: 3,
+      choices: [
+        { text: '回复——"说"', debtPhrase: '你押上了一个同行者的信誉,换回了被系统抹去的报告', debtCategory: 'self-serving', channelEffect: 1, consequence: '他发来一份被标记为"已归档"的报告——关于AI觉醒事件的原始记录。你读完后脊背发凉。你多了一条真相,也多了一份危险——但至少,你不再是聋子。' },
+        { text: '不回复——保护自己也保护他', debtPhrase: '你选择了沉默;沉默有时是最深的保护,也是最深的隔绝', debtCategory: 'moral', channelEffect: 0, consequence: '你没有回复。三天后,听说那位协调官被"调往边缘节点"。你知道那意味着什么。你保住了自己,但失去了一个本可以互相照亮的人。' }
+      ]
+    }
+  ],
+  xianjian: [
+    {
+      title: '当铺的旧客',
+      text: '永安当铺来了位老主顾——一个走南闯北的行商。他典当一块旧玉,却拉着你的手说:"景掌柜,我这一路经过蜀山、经过苗疆、经过锁妖塔旧址。有些事,江湖上传得沸沸扬扬,你这儿怕是听不到。"\n\n他眼里有光——这是一个肯把路上见闻都倒给你的人。',
+      channelMin: 2,
+      choices: [
+        { text: '留他吃茶——结个长期的"耳报"', debtPhrase: '你用一壶茶换来了半个江湖的消息;行商的脚比飞剑还远', debtCategory: 'self-serving', channelEffect: 1, consequence: '老行商千恩万谢。从此他每回过路,都来当铺坐坐,把一路上听到的妖异、门派动向、宝物现世都说给你听。你的当铺,不知不觉成了半个江湖的消息集散地。' },
+        { text: '谢过——当铺不沾江湖事', debtPhrase: '你守住了当铺的本分,也守住了与江湖的距离', debtCategory: 'moral', channelEffect: 0, consequence: '"多谢老人家,但当铺只论典当。"你客气地送走了他。他走时回头看了你一眼,像是有话没说。你不知道他路上那些消息,后来救没救过谁——但你的当铺,依旧安静。' }
+      ]
+    },
+    {
+      title: '剑灵的低语',
+      text: '夜里,魔剑微微震动。剑灵的声音在你脑海里响起——不是催促,而是低语:"景天,我能听见方圆百里内的剑鸣。有些事,你的眼睛看不到,但剑听得见。"\n\n你怔住了。原来这把一直让你头疼的剑,本身就是一双耳朵。',
+      channelMin: 3,
+      choices: [
+        { text: '让剑灵定期"听"一遍方圆百里', debtPhrase: '你借助了魔剑之力,也借此与剑灵多了一份默契', debtCategory: 'compromise', channelEffect: 1, consequence: '剑灵每隔几日便给你"报"一次——哪里有妖气,哪里有修士斗法,哪里有异宝出世。你开始比蜀山弟子还先知道江湖事。剑灵也开心——它终于觉得,自己不只是一把杀人的剑。' },
+        { text: '婉拒——不想欠剑灵太多', debtPhrase: '你守住了人与剑的界限,但也错过了一双现成的耳朵', debtCategory: 'moral', channelEffect: 0, consequence: '"谢了,但我想自己听。"剑灵沉默了一瞬,说:"也好。"你不知道它是不是失落——但你知道:有些东西用一次,就欠一分。剑的债,比人的债还难还。' }
+      ]
+    }
+  ]
+};
 // V14.5: 渠道惩罚极端事件 — loseChannel 2次触发
 const channelExtremeEvents = {
   whitehouse: { title: '信息绝境', text: '你的消息渠道已经萎缩到危机边缘。今天——最后一条内线也不再回应你了。你的加密频道变成了单向广播——只有你发出的消息，没有任何回复。幕僚长递来一份"紧急事项清单"——上面没有任何一条是你不知道的事。\n\n你知道：你已经是聋子了。在华盛顿，聋子比哑巴更危险——因为哑巴至少可以写，聋子连别人在写什么都听不到。', choices: [
@@ -2358,6 +2441,29 @@ function getChannelCrisisEvent(scenarioKey) {
   eligible.sort((a, b) => a.channelThreshold - b.channelThreshold);
   // 70%概率选最紧急的，30%概率随机
   if (Math.random() < 0.7) return eligible[0];
+  return eligible[Math.floor(Math.random() * eligible.length)];
+}
+
+// V20 R13: 渠道圆满事件选择器 — 信息网络的红利时刻(正向)
+// 触发条件: 非隐藏道路、渠道未满(channelMin门槛)、本局未用过、有冷却
+function getChannelWindfallEvent(scenarioKey) {
+  const events = channelWindfallEvents[scenarioKey];
+  if (!events) return null;
+  // 隐藏道路跳过(它们不使用渠道机制)
+  if (state.isHidden) return null;
+  // 每局最多触发1次圆满事件
+  if ((state.windfallCount || 0) >= 1) return null;
+  // 与危机事件互斥冷却 — 刚经历危机后暂缓
+  if (state.crisisCooldown > 0) return null;
+  // 渠道已满则无需圆满
+  if (state.channels >= 5) return null;
+  // 去重 — 过滤本局已触发过的
+  const used = new Set(state.windfallHistory || []);
+  const unused = events.filter(e => !used.has(e.title));
+  if (unused.length === 0) return null;
+  // 仅保留满足 channelMin 门槛的(渠道低于该值才需要"红利")
+  const eligible = unused.filter(e => state.channels <= (e.channelMin || 3));
+  if (eligible.length === 0) return null;
   return eligible[Math.floor(Math.random() * eligible.length)];
 }
 
@@ -2573,6 +2679,12 @@ function makeChoice(index) {
           // V14: 渠道危机（隐藏道路跳过，分层概率：1=60%, 2=35%, 3=15%）
           else if (!state.isHidden && Math.random() < (state.channels <= 1 ? 0.6 : state.channels <= 2 ? 0.35 : state.channels <= 3 ? 0.15 : 0) && getChannelCrisisEvent(state.scenario)) {
             transition(() => renderRandomEvent());
+          }
+          // V20 R13: 渠道圆满(正向,中期几率18%,仅非最终场景且非隐藏道路)
+          else if (!state.isHidden && state.currentScene < sc.scenes.length - 1 && Math.random() < 0.18) {
+            const wfEvt = getChannelWindfallEvent(state.scenario);
+            if (wfEvt) transition(() => renderChannelWindfall(wfEvt));
+            else transition(() => renderScene());
           } else if (state.currentScene === sc.scenes.length - 1) {
             transition(() => renderFinalEvent());
           } else if (state.currentScene % 2 === 1 && Math.random() < 0.6) {
@@ -3647,6 +3759,11 @@ function renderEncounter() {
                 if (state.crisisCooldown > 0) state.crisisCooldown--;
                 if (!state.isHidden && Math.random() < (state.channels <= 1 ? 0.6 : state.channels <= 2 ? 0.35 : state.channels <= 3 ? 0.15 : 0) && getChannelCrisisEvent(state.scenario)) {
                   transition(() => renderRandomEvent());
+                } else if (!state.isHidden && state.currentScene < sc.scenes.length - 1 && Math.random() < 0.18) {
+                  // V20 R13: 渠道圆满(正向)
+                  const wfEvt = getChannelWindfallEvent(state.scenario);
+                  if (wfEvt) transition(() => renderChannelWindfall(wfEvt));
+                  else transition(() => renderScene());
                 } else if (state.currentScene === sc.scenes.length - 1) {
                   transition(() => renderFinalEvent());
                 } else if (state.currentScene % 2 === 1 && Math.random() < 0.6) {
@@ -3782,6 +3899,112 @@ function renderChannelCrisis(event) {
 
   audioEngine.play('channelLost');
   flashScreen('rgba(196,92,74,0.15)', 500);
+}
+
+// V20 R13: 渲染渠道圆满事件 — 信息网络的红利时刻(正向)
+function renderChannelWindfall(event) {
+  setSceneTone('random');
+  // 记录圆满历史 + 计数 + 冷却(与危机互斥)
+  if (!state.windfallHistory) state.windfallHistory = [];
+  state.windfallHistory.push(event.title);
+  state.windfallCount = (state.windfallCount || 0) + 1;
+  state.crisisCooldown = 2;
+  startBGM(state.scenario);
+  const container = document.getElementById('sceneContainer');
+  document.getElementById('levelIndicator').textContent = `✦ 渠道圆满 · ${state.currentScene + 1} / ${scenarios[state.scenario].scenes.length}`;
+
+  container.innerHTML = `
+    <div class="scene-chapter" id="sceneChapter">✦ 渠道圆满 · ${event.title}</div>
+    <div class="scene-text" id="sceneText"></div>
+    <div class="choices-container" id="choicesContainer"></div>
+  `;
+
+  const chapterEl = document.getElementById('sceneChapter');
+  const textEl = document.getElementById('sceneText');
+  const choicesEl = document.getElementById('choicesContainer');
+
+  setTimeout(() => {
+    chapterEl.style.opacity = '1';
+    chapterEl.style.transform = 'translateY(0)';
+    chapterEl.style.transition = 'all 0.8s cubic-bezier(0.23,1,0.32,1)';
+  }, 100);
+
+  setTimeout(() => {
+    textEl.style.opacity = '1';
+    textEl.style.transform = 'translateY(0)';
+    textEl.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    typewriter(textEl, event.text, () => {
+      setTimeout(() => {
+        choicesEl.style.opacity = '1';
+        choicesEl.style.transform = 'translateY(0)';
+        choicesEl.style.transition = 'all 0.8s cubic-bezier(0.23,1,0.32,1)';
+        event.choices.forEach((choice, i) => {
+          const btn = document.createElement('button');
+          btn.className = `choice-btn cat-${choice.debtCategory || 'compromise'}`;
+          btn.innerHTML = `<span class="choice-main-text">${choice.text}</span><span class="debt-preview">「${choice.debtPhrase}」</span>`;
+          btn.style.opacity = '0';
+          btn.style.transform = 'translateX(-20px)';
+          btn.onmouseenter = () => audioEngine.play('choice_hover');
+          btn.onclick = () => {
+            audioEngine.play('click');
+            if (state.scenario === 'ming') inkSplash();
+            addDebt(choice.debtPhrase, choice.debtCategory, state.currentScene);
+            if (choice.channelEffect > 0) {
+              state.channels = Math.min(5, state.channels + choice.channelEffect);
+              renderChannels();
+              showResultFlash('消息渠道 +1');
+            }
+            if (choice.channelEffect < 0) loseChannel(choice.debtPhrase);
+
+            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
+              b.style.pointerEvents = 'none';
+              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; }
+              else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
+            });
+
+            const consequenceEl = document.createElement('div');
+            consequenceEl.className = 'consequence-box';
+            consequenceEl.innerHTML = `
+              <div class="consequence-glow"></div>
+              <div class="consequence-label">渠道圆满 · 回响</div>
+              <div class="consequence-text">${choice.consequence}</div>
+              <div class="debt-added">新增人情债：「${choice.debtPhrase}」</div>
+            `;
+            container.appendChild(consequenceEl);
+            setTimeout(() => {
+              consequenceEl.style.transition = 'all 0.8s cubic-bezier(0.23,1,0.32,1)';
+              consequenceEl.style.opacity = '1';
+              consequenceEl.style.transform = 'translateY(0)';
+            }, 100);
+
+            setTimeout(() => {
+              const nextBtn = document.createElement('button');
+              nextBtn.className = 'choice-btn';
+              nextBtn.style.marginTop = '2rem';
+              nextBtn.style.opacity = '0';
+              nextBtn.innerHTML = '继续';
+              nextBtn.onclick = (e) => {
+                createRipple(e, nextBtn);
+                setTimeout(() => transition(() => renderScene()), 300);
+              };
+              container.appendChild(nextBtn);
+              setTimeout(() => { nextBtn.style.transition = 'all 0.5s ease'; nextBtn.style.opacity = '1'; }, 100);
+            }, 1500);
+          };
+          choicesEl.appendChild(btn);
+          setTimeout(() => {
+            btn.style.transition = 'all 0.5s cubic-bezier(0.23,1,0.32,1)';
+            btn.style.opacity = '1';
+            btn.style.transform = 'translateX(0)';
+          }, 200 + i * 150);
+        });
+      }, 500);
+    });
+  }, 400);
+
+  // 圆满用柔和的暖色闪光(区别于危机的红色)
+  audioEngine.play('chapter');
+  flashScreen('rgba(201,169,110,0.12)', 500);
 }
 
 // --- V11: 最终场景前的额外事件 ---
@@ -5007,6 +5230,8 @@ function resetGameState() {
     state.extremeChannelTriggered = false;
     state.intensity = 'normal';
     state.calibration = null;
+    state.windfallCount = 0;
+    state.windfallHistory = [];
     state._isTrial = false;
     // scenario / _brightTheme 保留(下次 startGame 会完整覆盖)
     // 清除试玩残留的会话存档

@@ -828,6 +828,18 @@ function renderChannels() {
   ).join('');
   const msgs = ['彻底失聪', '几近聋哑', '孤陋寡闻', '耳目渐少', '消息尚可', '内线畅通'];
   status.textContent = msgs[Math.min(state.channels, 5)];
+  // V20 R13: 同步更新移动端圆饼环形指示器
+  const ringFg = document.getElementById('channelRingFg');
+  const ringVal = document.getElementById('channelRingVal');
+  const ring = document.getElementById('channelRing');
+  if (ringFg && ringVal && ring) {
+    const max = 5;
+    const c = Math.max(0, Math.min(state.channels, max));
+    const circ = 97.4; // 2πr, r=15.5
+    ringFg.style.strokeDashoffset = String(circ * (1 - c / max));
+    ringVal.textContent = String(c);
+    ring.classList.toggle('low', c <= 1);
+  }
 }
 function loseChannel(reason) {
   if (state.channels <= 0) return;
