@@ -1762,34 +1762,78 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
 
 /* ============================================================
    V20 R6: 首页 UI 三套变体
-   默认(grid)20% / ui-list 列表 40% / ui-cinematic 沉浸 40%
+   默认(grid)20% / ui-list 编年史时间轴 40% / ui-cinematic 剧场沉浸 40%
+   V21: 重构 ui-list / ui-cinematic 排版,统一设计语言,适配试玩卡与时空之渊
    ============================================================ */
 
-/* —— 变体 B: ui-list — 垂直编年清单 —— */
+/* —— 变体 B: ui-list — 编年史时间轴 —— */
+#landing.ui-list .divider-line{margin-bottom:2.2rem;}
+/* 试玩卡:作为编年史的「序章」入口,贴合时间轴语境 */
+#landing.ui-list .trial-preview{max-width:640px;margin:0 auto 1rem;}
+#landing.ui-list .trial-card{
+  padding:1.15rem 1.5rem;border-radius:10px;
+  background:linear-gradient(135deg,rgba(201,169,110,0.07),rgba(201,169,110,0.02));
+  border-color:rgba(201,169,110,0.26);
+}
+#landing.ui-list .trial-question{font-size:0.98rem;}
+#landing.ui-list .trial-scene-tag{font-size:0.66rem;}
+/* 时空之渊:编年史中的「异闻」节点,虚线描边呼应手抄孤本 */
+#landing.ui-list .chaos-entry{
+  margin:0 auto 2.2rem;max-width:640px;border-radius:6px;
+  border:1px dashed rgba(184,169,212,0.24);background:rgba(184,169,212,0.03);
+}
 #landing.ui-list .choice-cards{
   flex-direction:column;gap:0;width:100%;max-width:640px;margin:0 auto;
+  position:relative;
+}
+/* 时间轴左轨 */
+#landing.ui-list .choice-cards::before{
+  content:'';position:absolute;left:32px;top:8px;bottom:8px;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(201,169,110,0.22) 6%,rgba(201,169,110,0.1) 94%,transparent);
+  pointer-events:none;
 }
 #landing.ui-list .choice-card{
-  width:100%;padding:1.4rem 1.8rem;display:flex;align-items:center;gap:1.4rem;
-  border-left:3px solid transparent;border-top:1px solid rgba(255,255,255,0.05);
-  border-right:none;border-bottom:none;border-radius:0;background:transparent;
-  transition:transform 0.4s var(--ease-out-expo),background-color 0.4s var(--ease-out-expo),border-color 0.4s var(--ease-out-expo);
+  width:100%;max-width:none;padding:1.5rem 1.6rem 1.5rem 4.4rem;
+  display:flex;flex-direction:column;gap:0.3rem;
+  border:none;border-radius:0;background:transparent;
+  position:relative;
+  transition:background 0.45s var(--ease-out-expo),transform 0.45s var(--ease-out-expo);
 }
-#landing.ui-list .choice-card:first-child{border-top:none;}
-#landing.ui-list .choice-card .card-icon{font-size:1.8rem;margin:0;flex-shrink:0;}
+/* 时间轴节点(双层环) */
+#landing.ui-list .choice-card::before{
+  content:'';position:absolute;left:26px;top:50%;transform:translateY(-50%);
+  width:13px;height:13px;border-radius:50%;
+  background:var(--bg);border:1px solid rgba(201,169,110,0.4);
+  box-shadow:0 0 0 4px rgba(10,10,10,1);
+  transition:all 0.45s var(--ease-out-expo);z-index:2;
+}
+#landing.ui-list .choice-card::after{display:none;}
+#landing.ui-list .choice-card .card-atmosphere{display:none;}
+/* 编年史以文字为主,舍弃图标降噪 */
+#landing.ui-list .choice-card .card-icon{display:none;}
 #landing.ui-list .choice-card .card-era{
-  font-size:0.62rem;letter-spacing:0.25em;margin:0 0 0.3rem 0;color:var(--accent-w);opacity:0.7;
+  font-size:0.62rem;letter-spacing:0.3em;margin:0 0 0.35rem 0;
+  color:var(--accent-w);opacity:0.7;text-transform:uppercase;
+  transition:opacity 0.45s var(--ease-out-expo);
 }
 #landing.ui-list .choice-card h2{
-  font-size:1.15rem;margin:0 0 0.3rem 0;font-family:'Noto Serif SC',serif;
+  font-size:1.22rem;margin:0 0 0.45rem 0;font-family:'Noto Serif SC',serif;
+  font-weight:700;letter-spacing:0.02em;color:var(--text);
+  transition:color 0.45s var(--ease-out-expo);
 }
-#landing.ui-list .choice-card p{font-size:0.78rem;margin:0;color:var(--muted);line-height:1.5;}
-#landing.ui-list .choice-card .card-atmosphere{display:none;}
+#landing.ui-list .choice-card p{
+  font-size:0.78rem;margin:0;color:var(--muted);line-height:1.65;max-width:460px;
+}
 #landing.ui-list .choice-card:hover{
-  background:rgba(255,255,255,0.04);transform:translateX(8px);border-left-color:var(--accent-w);
+  background:linear-gradient(90deg,rgba(201,169,110,0.06),transparent 75%);
+  transform:translateX(5px);
 }
-#landing.ui-list .choice-card::before,
-#landing.ui-list .choice-card::after{display:none;}
+#landing.ui-list .choice-card:hover::before{
+  background:var(--accent-w);border-color:var(--accent-w);
+  box-shadow:0 0 0 4px rgba(10,10,10,1),0 0 16px rgba(201,169,110,0.45);
+}
+#landing.ui-list .choice-card:hover .card-era{opacity:1;}
+#landing.ui-list .choice-card:hover h2{color:var(--accent-w);}
 #landing.ui-list .choice-cards .choice-card:nth-child(n){
   animation:landingListIn 0.6s cubic-bezier(0.23,1,0.32,1) both;
 }
@@ -1801,49 +1845,95 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
 #landing.ui-list .choice-cards .choice-card:nth-child(6){animation-delay:1.10s;}
 #landing.ui-list .choice-cards .choice-card:nth-child(7){animation-delay:1.22s;}
 @keyframes landingListIn{
-  from{opacity:0;transform:translateX(-20px);}
+  from{opacity:0;transform:translateX(-26px);}
   to{opacity:1;transform:translateX(0);}
 }
 @media (max-width:600px){
-  #landing.ui-list .choice-cards{max-width:100%;}
-  #landing.ui-list .choice-card{padding:1.1rem 1.2rem;gap:1rem;}
-  #landing.ui-list .choice-card .card-icon{font-size:1.5rem;}
-  #landing.ui-list .choice-card h2{font-size:1.02rem;}
+  #landing.ui-list .choice-cards::before{left:24px;}
+  #landing.ui-list .choice-card{padding:1.3rem 1rem 1.3rem 3.7rem;}
+  #landing.ui-list .choice-card::before{left:18px;}
+  #landing.ui-list .choice-card h2{font-size:1.06rem;}
   #landing.ui-list .choice-card p{font-size:0.74rem;}
 }
+#landing.ui-list .landing-footer{margin-top:2.6rem;}
 
-/* —— 变体 C: ui-cinematic — 居中放大沉浸式 —— */
+/* —— 变体 C: ui-cinematic — 剧场沉浸式 —— */
+#landing.ui-cinematic .divider-line{margin-bottom:2.6rem;}
+/* 试玩卡:开幕序曲,放大加厚处理 */
+#landing.ui-cinematic .trial-preview{max-width:560px;margin:0 auto 2rem;}
+#landing.ui-cinematic .trial-card{
+  padding:1.75rem 1.9rem;border-radius:4px;
+  background:linear-gradient(160deg,rgba(201,169,110,0.1),rgba(20,18,16,0.5));
+  border:1px solid rgba(201,169,110,0.28);border-top-color:rgba(201,169,110,0.55);
+  box-shadow:0 26px 64px rgba(0,0,0,0.45),0 0 50px rgba(201,169,110,0.07);
+}
+#landing.ui-cinematic .trial-question{font-size:1.08rem;}
+/* 时空之渊:间幕,仅上下细线,戏剧化留白 */
+#landing.ui-cinematic .chaos-entry{
+  margin:0 auto 3rem;max-width:300px;padding:0.85rem 1.4rem;border-radius:0;
+  border-top:1px solid rgba(184,169,212,0.28);border-bottom:1px solid rgba(184,169,212,0.28);
+  border-left:none;border-right:none;background:transparent;
+}
+#landing.ui-cinematic .chaos-entry-line{display:none;}
 #landing.ui-cinematic .choice-cards{
-  flex-direction:column;align-items:center;gap:1.6rem;
+  flex-direction:column;align-items:center;gap:2rem;
+  counter-reset:scene;
 }
 #landing.ui-cinematic .choice-card{
-  width:100%;max-width:520px;padding:2.4rem 2rem;text-align:center;
-  border-radius:2px;background:rgba(20,18,16,0.55);
-  border:1px solid rgba(255,255,255,0.06);
-  box-shadow:0 30px 80px rgba(0,0,0,0.5);
-  transition:transform 0.6s var(--ease-out-expo),background-color 0.6s var(--ease-out-expo),border-color 0.6s var(--ease-out-expo),box-shadow 0.6s var(--ease-out-expo);
+  width:100%;max-width:540px;padding:2.8rem 2.4rem 2.6rem;
+  text-align:center;border-radius:3px;
+  background:linear-gradient(180deg,rgba(24,20,16,0.72),rgba(14,12,10,0.62));
+  border:1px solid rgba(255,255,255,0.05);
+  border-top:1px solid rgba(201,169,110,0.18);
+  box-shadow:0 30px 70px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.03);
+  position:relative;overflow:hidden;counter-increment:scene;
+  transition:transform 0.6s var(--ease-out-expo),background 0.6s var(--ease-out-expo),border-color 0.6s var(--ease-out-expo),box-shadow 0.6s var(--ease-out-expo);
 }
+/* 巨型斜体章节序号水印 */
+#landing.ui-cinematic .choice-card::before{
+  content:counter(scene,upper-roman);
+  position:absolute;top:-0.4rem;right:1.2rem;
+  font-family:'Cormorant Garamond',serif;font-size:7rem;font-weight:700;font-style:italic;
+  color:rgba(201,169,110,0.07);line-height:1;pointer-events:none;z-index:0;
+  transition:color 0.6s var(--ease-out-expo),transform 0.6s var(--ease-out-expo);
+}
+/* 底部聚光条 */
+#landing.ui-cinematic .choice-card::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%) scaleX(0);
+  width:58%;height:2px;background:linear-gradient(90deg,transparent,var(--accent-w),transparent);
+  transition:transform 0.6s var(--ease-out-expo);
+}
+#landing.ui-cinematic .choice-card:hover::after{transform:translateX(-50%) scaleX(1);}
+#landing.ui-cinematic .choice-card .card-atmosphere{display:none;}
 #landing.ui-cinematic .choice-card .card-icon{
-  font-size:3.2rem;margin-bottom:1.2rem;display:block;
-  transition:transform 0.5s cubic-bezier(0.23,1,0.32,1);
+  font-size:2.6rem;margin-bottom:1.3rem;display:block;position:relative;z-index:1;
+  filter:drop-shadow(0 4px 16px rgba(201,169,110,0.15));
+  transition:transform 0.5s cubic-bezier(0.23,1,0.32,1),filter 0.5s ease;
 }
 #landing.ui-cinematic .choice-card .card-era{
-  font-size:0.72rem;letter-spacing:0.4em;margin-bottom:1.2rem;
-  color:var(--accent-w);opacity:0.85;
+  font-size:0.7rem;letter-spacing:0.42em;margin-bottom:1.2rem;
+  color:var(--accent-w);opacity:0.8;text-transform:uppercase;position:relative;z-index:1;
 }
 #landing.ui-cinematic .choice-card h2{
-  font-size:1.8rem;margin-bottom:1.2rem;letter-spacing:0.08em;
+  font-size:1.85rem;margin-bottom:1.2rem;letter-spacing:0.06em;position:relative;z-index:1;
 }
 #landing.ui-cinematic .choice-card p{
-  font-size:0.88rem;line-height:1.8;color:var(--muted);
+  font-size:0.86rem;line-height:1.85;color:var(--muted);position:relative;z-index:1;
 }
 #landing.ui-cinematic .choice-card:hover{
-  transform:translateY(-6px) scale(1.02);
-  background:rgba(30,26,22,0.7);
-  border-color:rgba(201,169,110,0.3);
-  box-shadow:0 40px 100px rgba(0,0,0,0.6),0 0 60px rgba(201,169,110,0.15);
+  transform:translateY(-6px);
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%,rgba(201,169,110,0.13),transparent 70%),
+    linear-gradient(180deg,rgba(32,26,20,0.85),rgba(18,14,10,0.72));
+  border-top-color:rgba(201,169,110,0.55);
+  box-shadow:0 44px 100px rgba(0,0,0,0.6),0 0 70px rgba(201,169,110,0.14),inset 0 1px 0 rgba(255,255,255,0.05);
 }
-#landing.ui-cinematic .choice-card:hover .card-icon{transform:scale(1.1) rotate(-2deg);}
+#landing.ui-cinematic .choice-card:hover::before{
+  color:rgba(201,169,110,0.15);transform:translateY(-4px);
+}
+#landing.ui-cinematic .choice-card:hover .card-icon{
+  transform:scale(1.12) translateY(-2px);filter:drop-shadow(0 8px 24px rgba(201,169,110,0.3));
+}
 #landing.ui-cinematic .choice-cards .choice-card:nth-child(n){
   animation:landingCineIn 0.9s cubic-bezier(0.23,1,0.32,1) both;
 }
@@ -1855,15 +1945,17 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
 #landing.ui-cinematic .choice-cards .choice-card:nth-child(6){animation-delay:1.50s;}
 #landing.ui-cinematic .choice-cards .choice-card:nth-child(7){animation-delay:1.68s;}
 @keyframes landingCineIn{
-  from{opacity:0;transform:translateY(30px) scale(0.96);filter:blur(6px);}
+  from{opacity:0;transform:translateY(40px) scale(0.96);filter:blur(8px);}
   to{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
 }
 @media (max-width:600px){
-  #landing.ui-cinematic .choice-card{padding:1.8rem 1.3rem;}
-  #landing.ui-cinematic .choice-card .card-icon{font-size:2.4rem;}
-  #landing.ui-cinematic .choice-card h2{font-size:1.4rem;}
+  #landing.ui-cinematic .choice-card{padding:2rem 1.4rem;}
+  #landing.ui-cinematic .choice-card::before{font-size:5rem;right:0.6rem;}
+  #landing.ui-cinematic .choice-card .card-icon{font-size:2.2rem;}
+  #landing.ui-cinematic .choice-card h2{font-size:1.45rem;}
   #landing.ui-cinematic .choice-card p{font-size:0.82rem;}
 }
+#landing.ui-cinematic .landing-footer{margin-top:3.4rem;}
 
 /* V21 [L3]: 渠道调性染色旁白 —— 低饱和度+斜体,氛围层 */
 .channel-tint{
