@@ -1567,9 +1567,16 @@ function renderScene() {
   if (scene._appendedText) {
     scene.text = scene.text + '\n\n' + scene._appendedText;
   }
-  // V14.3: narratorVariants 30%概率替换（判定理念不每次都出现）
-  if (scene.narratorVariants && scene.narratorVariants.length > 0 && Math.random() < 0.3) {
-    scene.narrator = scene.narratorVariants[Math.floor(Math.random() * scene.narratorVariants.length)];
+  // V21 [L2]: narratorVariants 按渠道档选择——低/高档强制,中档保留30%随机
+  if (scene.narratorVariants && scene.narratorVariants.length > 0) {
+    const ch = state.channels;
+    if (ch <= 1 && scene.narratorVariants.length >= 1) {
+      scene.narrator = scene.narratorVariants[0];                              // 孤冷档强制
+    } else if (ch >= 6 && scene.narratorVariants.length >= 2) {
+      scene.narrator = scene.narratorVariants[scene.narratorVariants.length - 1]; // 壮烈档强制
+    } else if (Math.random() < 0.3) {
+      scene.narrator = scene.narratorVariants[Math.floor(Math.random() * scene.narratorVariants.length)]; // 中档保留30%随机
+    }
   }
   const container = document.getElementById('sceneContainer');
   document.getElementById('levelIndicator').textContent = `${state.currentScene + 1} / ${sc.scenes.length}`;
