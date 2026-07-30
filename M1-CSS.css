@@ -2188,15 +2188,15 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
 .claw-unlock-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(184,169,212,0.3);background:linear-gradient(180deg,rgba(184,169,212,0.4),rgba(184,169,212,0.15));}
 
 #landing.ui-claw .landing-footer{margin-top:1.4rem;}
-/* V21.3 it3: 移动端 — 让出标题/试玩卡空间给机台,确保全部球可见 */
+/* V21.4: 移动端 — 预览时显示标题; .claw-playing 操作时才让出标题空间给机台 */
 @media (max-width:600px){
   #landing.ui-claw{padding-top:0.3rem;}
   #landing.ui-claw h1{font-size:clamp(0.9rem,3.5vw,1.4rem);margin:0 0 0.1rem;letter-spacing:0.12em;}
   #landing.ui-claw .subtitle{display:none;}
-  #landing.ui-claw .divider-line{display:none;}
-  #landing.ui-claw .trial-preview{display:none;}
+  #landing.ui-claw .divider-line{margin:0 auto 0.5rem;}
+  #landing.ui-claw .trial-preview{margin:0 auto 0.5rem;}
   #landing.ui-claw .chaos-entry{margin:0 auto 0.5rem;max-width:180px;padding:0.3rem 0.7rem;font-size:0.58rem;}
-  #landing.ui-claw .claw-machine{height:78vh;max-height:520px;min-height:380px;max-width:100%;}
+  #landing.ui-claw .claw-machine{height:60vh;max-height:440px;min-height:340px;max-width:100%;}
   #landing.ui-claw .claw-marquee{top:6px;font-size:0.56rem;padding:0.12rem 0.9rem;}
   #landing.ui-claw .claw-ball{width:62px;height:62px;}
   #landing.ui-claw .claw-ball .card-icon{font-size:1.1rem;}
@@ -2207,6 +2207,14 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   #landing.ui-claw .claw-hint{bottom:56px;font-size:0.58rem;}
   #landing.ui-claw .claw-shard-tray{bottom:36px;padding:0.2rem 0.55rem;gap:0.28rem;font-size:0.54rem;}
   #landing.ui-claw .landing-footer{margin-top:0.5rem;}
+  /* 操作状态:隐藏标题/试玩卡/分割线,机台占满空间 */
+  #landing.ui-claw.claw-playing h1,
+  #landing.ui-claw.claw-playing .subtitle,
+  #landing.ui-claw.claw-playing .divider-line,
+  #landing.ui-claw.claw-playing .trial-preview,
+  #landing.ui-claw.claw-playing .chaos-entry{display:none;}
+  #landing.ui-claw.claw-playing{padding-top:0.2rem;}
+  #landing.ui-claw.claw-playing .claw-machine{height:80vh;max-height:540px;min-height:400px;}
 }
 
 /* ============================================================
@@ -2409,15 +2417,15 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   pointer-events:none;white-space:nowrap;font-style:italic;
 }
 #landing.ui-astro .landing-footer{margin-top:1.8rem;}
-/* V21.3 it3: 移动端星图响应式 — 缩小星点/字号,压缩上方间距 */
+/* V21.4: 移动端星图 — 预览时显示标题; .astro-playing 操作时才让出空间 */
 @media (max-width:600px){
   #landing.ui-astro{padding-top:0.3rem;}
   #landing.ui-astro h1{font-size:clamp(0.9rem,3.5vw,1.4rem);margin:0 0 0.1rem;letter-spacing:0.12em;}
   #landing.ui-astro .subtitle{display:none;}
-  #landing.ui-astro .divider-line{display:none;}
-  #landing.ui-astro .trial-preview{margin:0 auto 0.6rem;}
+  #landing.ui-astro .divider-line{margin:0 auto 0.5rem;}
+  #landing.ui-astro .trial-preview{margin:0 auto 0.5rem;}
   #landing.ui-astro .trial-card{padding:0.7rem 1rem;}
-  #landing.ui-astro .astro-map{height:74vh;max-height:500px;min-height:360px;max-width:100%;}
+  #landing.ui-astro .astro-map{height:56vh;max-height:420px;min-height:320px;max-width:100%;}
   #landing.ui-astro .astro-star{width:64px;gap:0.2rem;padding:0.25rem;}
   #landing.ui-astro .astro-star .astro-star-core{width:42px;height:42px;font-size:1.1rem;}
   #landing.ui-astro .astro-star .astro-star-core::before{width:66px;}
@@ -2426,6 +2434,13 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   #landing.ui-astro .astro-star .astro-era{font-size:0.46rem;}
   #landing.ui-astro .astro-caption{font-size:0.56rem;bottom:8px;}
   #landing.ui-astro .landing-footer{margin-top:0.6rem;}
+  /* 操作状态:隐藏标题/试玩卡/分割线,星图占满空间 */
+  #landing.ui-astro.astro-playing h1,
+  #landing.ui-astro.astro-playing .subtitle,
+  #landing.ui-astro.astro-playing .divider-line,
+  #landing.ui-astro.astro-playing .trial-preview{display:none;}
+  #landing.ui-astro.astro-playing{padding-top:0.2rem;}
+  #landing.ui-astro.astro-playing .astro-map{height:80vh;max-height:540px;min-height:400px;}
 }
 
 /* V21 [L3]: 渠道调性染色旁白 —— 低饱和度+斜体,氛围层 */

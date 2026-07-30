@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>权力的游戏 v21.3</title>
+<title>权力的游戏 v21.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700&family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -288,8 +288,8 @@
   // V21.2: 用 setTimeout(0) 确保在所有 DOMContentLoaded 处理器(含隐藏道路解锁逻辑)之后初始化,
   //        否则机台会拿到尚未解锁/仍 display:none 的卡片,神秘球检测也会失效
   function _initVariant(){
-    if (variant === 'ui-claw' && typeof initClawMachine === 'function') initClawMachine();
-    if (variant === 'ui-astro' && typeof initAstroMap === 'function') initAstroMap();
+    if (variant === 'ui-claw' && typeof window.initClawMachine === 'function') window.initClawMachine();
+    if (variant === 'ui-astro' && typeof window.initAstroMap === 'function') window.initAstroMap();
     // V21: 设置切换按钮标签
     var btn = document.getElementById('variantSwitchBtn');
     if (btn) {
@@ -473,6 +473,8 @@
     var busy = false;
     btn.addEventListener('click', function(){
       if (busy) return;
+      // V21.4: 操作时让出标题空间(移动端)
+      landing.classList.add('claw-playing');
       busy = true; btn.disabled = true;
       // V21.3 it2: 投币动画 + 投币音
       try { audioEngine.play('coin'); } catch(e){}
@@ -583,9 +585,12 @@
       // 重新初始化机台以更新神秘球
       try {
         var landing = document.getElementById('landing');
-        if (landing && landing.classList.contains('ui-claw') && typeof initClawMachine === 'function') {
+        if (landing && landing.classList.contains('ui-claw') && typeof window.initClawMachine === 'function') {
+          // V21.4: 先把卡片从机台捞回,再删机台,避免卡片丢失
+          var _cardsWrap = landing.querySelector('.choice-cards');
+          landing.querySelectorAll('.claw-machine .choice-card').forEach(function(c){ if(_cardsWrap) _cardsWrap.appendChild(c); });
           landing.querySelectorAll('.claw-machine').forEach(function(el){ el.remove(); });
-          initClawMachine();
+          window.initClawMachine();
         }
       } catch(e){}
     });
@@ -720,6 +725,8 @@
     // hover 星点:点亮星点 + 相连线 + 涟漪 + 音效
     nodes.forEach(function(node, idx){
       node.card.addEventListener('mouseenter', function(){
+        // V21.4: 操作时让出标题空间(移动端)
+        landing.classList.add('astro-playing');
         lineEls.forEach(function(l){
           if (l.a === idx || l.b === idx) l.el.classList.add('lit');
         });
@@ -753,13 +760,18 @@
     if (!current) current = 'ui-grid';
     var next = VARIANT_ORDER[(VARIANT_ORDER.indexOf(current) + 1) % VARIANT_ORDER.length];
 
-    // 清理 claw/astro 注入的机台/星图 DOM,并把卡片还原回 .choice-cards
-    landing.querySelectorAll('.claw-machine, .astro-map').forEach(function(el){ el.remove(); });
+    // V21.4 修复:卡片被 initClawMachine/initAstroMap 移入机台/星图,
+    // 直接 remove() 会把卡片一起删掉 → 切换后"只有标题"。
+    // 必须先把卡片从机台/星图里捞回 .choice-cards,再删除机台/星图。
     var cardsWrap = landing.querySelector('.choice-cards');
+    var rescued = landing.querySelectorAll('.claw-machine .choice-card, .astro-map .choice-card');
+    rescued.forEach(function(card){ if (cardsWrap) cardsWrap.appendChild(card); });
+    // 清理 claw/astro 注入的机台/星图 DOM(卡片已捞回)
+    landing.querySelectorAll('.claw-machine, .astro-map').forEach(function(el){ el.remove(); });
     // 还原所有卡片:移除 claw-ball/astro-star class 与内联定位,把卡片放回 choice-cards
     var cards = landing.querySelectorAll('.choice-card');
     cards.forEach(function(card){
-      card.classList.remove('claw-ball', 'astro-star');
+      card.classList.remove('claw-ball', 'astro-star', 'claw-pick', 'claw-target');
       card.removeAttribute('style');
       // astro 变体重组过内部结构,需还原原始结构(图标/era/h2/p)
       if (!card.querySelector('h2')) {
@@ -785,14 +797,15 @@
       if (cardsWrap) cardsWrap.appendChild(card);
     });
 
-    // 切换 class
+    // 切换 class + 清除操作状态
     VARIANT_ORDER.forEach(function(v){ landing.classList.remove(v); });
+    landing.classList.remove('claw-playing', 'astro-playing');
     landing.classList.add(next);
     try { sessionStorage.setItem('landingVariant', next); } catch(e){}
 
-    // 重新初始化对应变体
-    if (next === 'ui-claw' && typeof initClawMachine === 'function') initClawMachine();
-    if (next === 'ui-astro' && typeof initAstroMap === 'function') initAstroMap();
+    // 重新初始化对应变体(V21.4: 用 window 引用避免作用域问题)
+    if (next === 'ui-claw' && typeof window.initClawMachine === 'function') window.initClawMachine();
+    if (next === 'ui-astro' && typeof window.initAstroMap === 'function') window.initAstroMap();
 
     // 切换音效 + BGM
     try { audioEngine.play('variant_switch'); } catch(e){}
