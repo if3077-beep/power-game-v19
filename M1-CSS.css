@@ -72,10 +72,6 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 /* V19 R4.1: 3秒试玩预览条 — 吸引非文字游戏群体 */
 .trial-preview{max-width:520px;margin:0 auto 2.5rem;animation:fadeUp 0.9s var(--ease-out-expo) 0.7s both;}
 .trial-label{font-size:0.68rem;color:var(--accent-w);letter-spacing:0.18em;opacity:0.75;margin-bottom:0.7rem;text-align:center;text-transform:uppercase;}
-/* V20: 试玩入口眉标 — 呼吸点 + 标签 */
-.trial-eyebrow{display:flex;align-items:center;justify-content:center;gap:0.55rem;margin-bottom:0.9rem;font-family:'Rajdhani','Noto Serif SC',sans-serif;font-size:0.7rem;color:var(--accent-w);letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;}
-.trial-eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-w);box-shadow:0 0 10px rgba(201,169,110,0.8);animation:trialPulse 1.8s ease-in-out infinite;}
-@keyframes trialPulse{0%,100%{opacity:0.4;transform:scale(0.85);}50%{opacity:1;transform:scale(1.25);box-shadow:0 0 16px rgba(201,169,110,0.9);}}
 .trial-card{position:relative;padding:1.4rem 1.6rem 1.3rem;background:linear-gradient(135deg,rgba(201,169,110,0.08),rgba(184,169,212,0.05));border:1px solid rgba(201,169,110,0.28);border-radius:14px;cursor:pointer;transition:all 0.45s var(--ease-out-expo);overflow:hidden;}
 .trial-card-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,169,110,0.12),transparent 65%);opacity:0.6;pointer-events:none;transition:opacity 0.45s ease;}
 .trial-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.12),transparent);transition:left 0.8s var(--ease-out-expo);}
