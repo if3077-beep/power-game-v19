@@ -1620,12 +1620,14 @@ function renderScene() {
 
   container.innerHTML = `
     <div class="scene-chapter" id="sceneChapter">${scene.chapter} · ${scene.title}</div>
+    <div class="channel-tint" id="sceneTint"></div>
     <div class="scene-text" id="sceneText"></div>
     <div class="scene-narrator" id="sceneNarrator"></div>
     <div class="choices-container" id="choicesContainer"></div>
   `;
 
   const chapterEl = document.getElementById('sceneChapter');
+  const tintEl = document.getElementById('sceneTint');
   const textEl = document.getElementById('sceneText');
   const narratorEl = document.getElementById('sceneNarrator');
   const choicesEl = document.getElementById('choicesContainer');
@@ -1636,6 +1638,16 @@ function renderScene() {
     chapterEl.style.transition = 'all 0.8s cubic-bezier(0.23,1,0.32,1)';
     // V20 R10: 章节音效与标题入场同步(100ms对齐)
     audioEngine.play(getChapterSound(state.currentScene, sc.scenes.length));
+    // V21 [L3]: 渠道染色旁白注入(与章节标题同步入场)
+    if (typeof getChannelTint === 'function') {
+      const tint = getChannelTint(state.scenario, state.channels);
+      if (tint && tintEl) {
+        tintEl.textContent = tint;
+        tintEl.style.opacity = '1';
+        tintEl.style.transform = 'translateY(0)';
+        tintEl.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      }
+    }
   }, 100);
 
   setTimeout(() => {

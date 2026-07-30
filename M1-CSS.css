@@ -1856,3 +1856,16 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   #landing.ui-cinematic .choice-card p{font-size:0.82rem;}
 }
 
+/* V21 [L3]: 渠道调性染色旁白 —— 低饱和度+斜体,氛围层 */
+.channel-tint{
+  font-style:italic;
+  color:var(--text-dim, #8a8a8a);
+  opacity:0;
+  letter-spacing:0.04em;
+  margin:0.4em 0 0.8em;
+  border-left:2px solid rgba(201,169,110,0.3);
+  padding-left:0.8em;
+  font-size:0.85rem;
+  transform:translateY(8px);
+}
+
