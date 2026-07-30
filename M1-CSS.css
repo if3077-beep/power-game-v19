@@ -134,8 +134,11 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .choice-card h2{font-family:'Noto Serif SC',serif;font-size:1.6rem;font-weight:700;margin-bottom:1rem;line-height:1.4;}
 .choice-card p{font-size:0.85rem;color:var(--muted);line-height:1.7;}
 .choice-card .card-icon{font-size:2.5rem;margin-bottom:1rem;display:block;}
-.landing-footer{margin-top:3rem;animation:fadeUp 1.2s ease-out 1s both;display:flex;justify-content:center;}
+.landing-footer{margin-top:3rem;animation:fadeUp 1.2s ease-out 1s both;display:flex;justify-content:center;gap:1rem;align-items:center;flex-wrap:wrap;}
 .landing-footer button{padding:0.7rem 2.5rem;background:linear-gradient(135deg,rgba(201,169,110,0.08),rgba(201,169,110,0.02));border:1px solid rgba(201,169,110,0.25);color:var(--accent-w);font-family:'Noto Serif SC',serif;font-size:0.9rem;cursor:pointer;transition:transform 0.4s var(--ease-out-expo),background-color 0.4s var(--ease-out-expo),border-color 0.4s var(--ease-out-expo),box-shadow 0.4s var(--ease-out-expo),color 0.4s var(--ease-out-expo);letter-spacing:0.1em;position:relative;overflow:hidden;}
+/* V21: 变体切换按钮 — 紫调区分,稍小 */
+.variant-switch-btn{padding:0.6rem 1.8rem !important;font-size:0.8rem !important;border-color:rgba(184,169,212,0.35) !important;color:#b8a9d4 !important;background:linear-gradient(135deg,rgba(184,169,212,0.08),rgba(184,169,212,0.02)) !important;}
+.variant-switch-btn:hover{border-color:#b8a9d4 !important;color:#d4c8ec !important;background:linear-gradient(135deg,rgba(184,169,212,0.18),rgba(184,169,212,0.05)) !important;box-shadow:0 8px 30px rgba(184,169,212,0.15) !important;}
 .landing-footer button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,0.15),transparent);transition:left 0.6s ease;}
 .landing-footer button:hover::before{left:100%;}
 .landing-footer button:hover{border-color:var(--accent-w);color:var(--text);background:linear-gradient(135deg,rgba(201,169,110,0.15),rgba(201,169,110,0.05));box-shadow:0 8px 30px rgba(201,169,110,0.1);transform:translateY(-2px);}
@@ -1805,6 +1808,28 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   background:linear-gradient(90deg,transparent,rgba(201,169,110,0.4),rgba(201,169,110,0.4),transparent);
   z-index:3;
 }
+/* V21: 机台顶部招牌 */
+#landing.ui-claw .claw-marquee{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  padding:0.18rem 1.4rem;font-family:'Noto Serif SC',serif;font-size:0.66rem;letter-spacing:0.3em;
+  color:var(--accent-w);background:var(--bg);border:1px solid rgba(201,169,110,0.4);border-radius:1rem;
+  z-index:6;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,0,0,0.4);
+}
+/* V21: 投币口 */
+#landing.ui-claw .claw-coin-slot{
+  position:absolute;top:8px;right:14px;width:18px;height:3px;border-radius:2px;
+  background:rgba(0,0,0,0.5);box-shadow:inset 0 1px 2px rgba(0,0,0,0.6);z-index:3;
+}
+/* V21: 庆祝粒子 */
+#landing.ui-claw .claw-confetti{
+  position:absolute;width:6px;height:6px;border-radius:50%;z-index:7;pointer-events:none;
+  animation:clawConfettiFly 0.9s ease-out forwards;
+}
+@keyframes clawConfettiFly{
+  0%{opacity:1;transform:translate(0,0) scale(1);}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0.3);}
+}
 /* 爪子(JS 注入) */
 #landing.ui-claw .claw-arm{
   position:absolute;top:16px;left:50%;width:50px;height:0;z-index:4;
@@ -1961,6 +1986,41 @@ body.theme-ai-bright .game-header{background:linear-gradient(180deg,#f0f4f8 60%,
   transition:stroke 0.5s var(--ease-out-expo),stroke-width 0.5s var(--ease-out-expo);
 }
 #landing.ui-astro .astro-lines line.lit{stroke:rgba(201,169,110,0.55);stroke-width:1.5;}
+/* V21: 连线逐条画出 — 用 stroke-dasharray + dashoffset 动画 */
+#landing.ui-astro .astro-lines line.astro-line-draw{
+  stroke-dasharray:120;stroke-dashoffset:120;opacity:0;
+  animation:astroLineDraw 0.7s ease-out forwards;
+}
+@keyframes astroLineDraw{
+  0%{stroke-dashoffset:120;opacity:0;}
+  30%{opacity:1;}
+  100%{stroke-dashoffset:0;opacity:1;}
+}
+/* V21: 流星 */
+#landing.ui-astro .astro-meteor{
+  position:absolute;top:14%;left:78%;width:90px;height:1.5px;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.85),transparent);
+  border-radius:50%;opacity:0;
+  animation:astroMeteor 9s ease-in 3s infinite;
+  transform:rotate(28deg);
+}
+@keyframes astroMeteor{
+  0%{opacity:0;transform:translate(0,0) rotate(28deg);}
+  3%{opacity:0.9;}
+  12%{opacity:0;transform:translate(-260px,140px) rotate(28deg);}
+  100%{opacity:0;transform:translate(-260px,140px) rotate(28deg);}
+}
+/* V21: 星点涟漪 */
+#landing.ui-astro .astro-ripple{
+  position:absolute;width:40px;height:40px;transform:translate(-50%,-50%);
+  border:1px solid rgba(201,169,110,0.5);border-radius:50%;
+  pointer-events:none;z-index:3;opacity:0;
+  animation:astroRipple 0.9s ease-out forwards;
+}
+@keyframes astroRipple{
+  0%{opacity:0.8;width:20px;height:20px;}
+  100%{opacity:0;width:80px;height:80px;}
+}
 /* 星点(道路) */
 #landing.ui-astro .astro-star{
   position:absolute;width:92px;transform:translate(-50%,-50%);

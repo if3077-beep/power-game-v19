@@ -342,6 +342,47 @@ class AudioEngine {
         setTimeout(() => this._tone(55, 0.55, 'sine', this.sfxGain, 0.2), 90);
         this._delay(60, 0.7, 0.1);
       },
+      // V21: 首页变体音效
+      variant_switch: () => {
+        // 变体切换 sweep 升降
+        this._tone(440, 0.08, 'sine', this.sfxGain, 0.18);
+        setTimeout(() => this._tone(660, 0.1, 'sine', this.sfxGain, 0.16), 60);
+        setTimeout(() => this._tone(880, 0.14, 'sine', this.sfxGain, 0.12), 130);
+        this._delay(660, 0.4, 0.08);
+      },
+      coin: () => {
+        // 投币音:金属叮
+        this._tone(1318, 0.06, 'sine', this.sfxGain, 0.2);
+        setTimeout(() => this._tone(1760, 0.08, 'sine', this.sfxGain, 0.15), 50);
+      },
+      claw_drop: () => {
+        // 爪子下降:机械咔嗒 + 低嗡
+        this._tone(220, 0.4, 'sawtooth', this.sfxGain, 0.14);
+        this._noise(0.08, 0.06);
+        setTimeout(() => this._tone(180, 0.3, 'sawtooth', this.sfxGain, 0.1), 200);
+      },
+      claw_grab: () => {
+        // 爪子闭合:金属咬合
+        this._tone(140, 0.12, 'square', this.sfxGain, 0.2);
+        setTimeout(() => this._tone(110, 0.15, 'square', this.sfxGain, 0.16), 80);
+        this._noise(0.1, 0.08);
+      },
+      claw_win: () => {
+        // 抓取成功:欢快上行琶音
+        [523, 659, 784, 1047].forEach((n, i) => setTimeout(() => this._tone(n, 0.18, 'sine', this.sfxGain, 0.2), i * 90));
+        this._delay(784, 0.8, 0.1);
+      },
+      star_ping: () => {
+        // 星点亮:高频钟音
+        this._tone(1568, 0.5, 'sine', this.sfxGain, 0.18);
+        this._delay(2093, 0.8, 0.08);
+        setTimeout(() => this._tone(2637, 0.3, 'sine', this.sfxGain, 0.1), 120);
+      },
+      line_draw: () => {
+        // 连线绘制:sweep 嗖
+        this._tone(880, 0.3, 'sine', this.sfxGain, 0.12);
+        setTimeout(() => this._tone(1320, 0.2, 'sine', this.sfxGain, 0.08), 100);
+      },
     };
     (sounds[type] || sounds.click)();
   }
@@ -445,6 +486,28 @@ class AudioEngine {
         harmony: [110,130,146,130,110, 98,110,130,146,165,146,130,110,124,130,110],
         bass:    [55, 65, 73, 65, 55, 49, 55, 65, 73, 82, 73, 65, 55, 62, 65, 55],
         wave: 'triangle', harmWave: 'sine', tempo: 2800, melVol: 0.18, harmVol: 0.1, bassVol: 0.14,
+      },
+      // V21: 首页三变体专属 BGM
+      landing_grid: {
+        // 宏大殿堂 D小调 庄严缓慢 管风琴感
+        melody:  [293,349,392,440,392,349,293,261,293,349,392,523,440,392,349,293],
+        harmony: [146,175,196,220,196,175,146,130,146,175,196,261,220,196,175,146],
+        bass:    [73, 87, 98,110, 98, 87, 73, 65, 73, 87, 98,130,110, 98, 87, 73],
+        wave: 'triangle', harmWave: 'sine', tempo: 3000, melVol: 0.2, harmVol: 0.11, bassVol: 0.15,
+      },
+      landing_claw: {
+        // 抓娃娃机 八音盒/发条 C大调 跳跃活泼
+        melody:  [523,659,784,659,523,587,659,784,1047,784,659,587,523,587,659,523],
+        harmony: [261,330,392,330,261,293,330,392,523,392,330,293,261,293,330,261],
+        bass:    [130,165,196,165,130,147,165,196,261,196,165,147,130,147,165,130],
+        wave: 'sine', harmWave: 'triangle', tempo: 1100, melVol: 0.16, harmVol: 0.09, bassVol: 0.1,
+      },
+      landing_astro: {
+        // 命运星图 空灵长音 E小调 缓慢 pad 泛音
+        melody:  [330,392,494,587,494,392,330,294,330,392,494,659,587,494,392,330],
+        harmony: [165,196,247,294,247,196,165,147,165,196,247,330,294,247,196,165],
+        bass:    [82, 98,124,147,124, 98, 82, 73, 82, 98,124,165,147,124, 98, 82],
+        wave: 'sine', harmWave: 'sine', tempo: 3600, melVol: 0.17, harmVol: 0.12, bassVol: 0.13,
       },
     };
     const cfg = configs[style] || configs.whitehouse;

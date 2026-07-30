@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>权力的游戏 v20.4</title>
+<title>权力的游戏 v21.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700&family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -132,6 +132,7 @@
   </div>
   <div class="landing-footer">
     <button onclick="showGallery()">结局图鉴</button>
+    <button id="variantSwitchBtn" class="variant-switch-btn" onclick="cycleLandingVariant()" title="切换主页样式">幻 景</button>
   </div>
 </div>
 
@@ -287,6 +288,19 @@
   function _initVariant(){
     if (variant === 'ui-claw' && typeof initClawMachine === 'function') initClawMachine();
     if (variant === 'ui-astro' && typeof initAstroMap === 'function') initAstroMap();
+    // V21: 设置切换按钮标签
+    var btn = document.getElementById('variantSwitchBtn');
+    if (btn) {
+      var labels = { 'ui-grid': '殿 堂', 'ui-claw': '抓 取', 'ui-astro': '星 图' };
+      btn.textContent = labels[variant] || '幻 景';
+    }
+    // V21: 音频已启用时启动对应 BGM
+    try {
+      if (typeof audioEngine !== 'undefined' && audioEngine.enabled) {
+        var bgmMap = { 'ui-grid': 'landing_grid', 'ui-claw': 'landing_claw', 'ui-astro': 'landing_astro' };
+        if (typeof startBGM === 'function') startBGM(bgmMap[variant]);
+      }
+    } catch(e){}
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _initVariant);
@@ -325,8 +339,10 @@
     var machine = document.createElement('div');
     machine.className = 'claw-machine';
     machine.innerHTML =
+      '<div class="claw-marquee">◆ 命 运 抓 取 机 ◆</div>' +
       '<div class="claw-rail"></div>' +
       '<div class="claw-arm" id="clawArm"><div class="claw-cord" id="clawCord"></div><div class="claw-grip"></div></div>' +
+      '<div class="claw-coin-slot"></div>' +
       '<div class="claw-hint">点球进入 · 或按抓取随机选</div>' +
       '<button class="claw-button" id="clawButton">抓 取</button>';
 
@@ -354,7 +370,7 @@
       card.style.animationDelay = (i * 0.4) + 's';
     });
 
-    // 抓取动画
+    // 抓取动画 + 音效
     var arm = machine.querySelector('#clawArm');
     var cord = machine.querySelector('#clawCord');
     var btn = machine.querySelector('#clawButton');
@@ -362,6 +378,8 @@
     btn.addEventListener('click', function(){
       if (busy) return;
       busy = true; btn.disabled = true;
+      // 投币音
+      try { audioEngine.play('coin'); } catch(e){}
       // 随机选一个可见球作为目标
       var target = visible[Math.floor(Math.random() * visible.length)];
       var targetLeft = parseFloat(target.style.left);
@@ -369,14 +387,19 @@
       // 1. 爪子移到目标正上方(轨道 top 16px, 用 left% 定位)
       arm.style.left = targetLeft + '%';
       target.classList.add('claw-target');
-      // 2. 下降(cord 高度 = 球 top - 轨道)
+      // 2. 下降(cord 高度 = 球 top - 轨道)+ 机械音
       var dropH = (targetTop / 100) * 480 - 16;
-      setTimeout(function(){ cord.style.height = dropH + 'px'; arm.classList.add('claw-grabbing'); }, 650);
-      // 3. 闭合
-      setTimeout(function(){ arm.classList.remove('claw-grabbing'); arm.classList.add('claw-closed'); }, 1250);
-      // 4. 升起
-      setTimeout(function(){ cord.style.height = '0px'; }, 1700);
-      // 5. 提示该球高亮,2.6s 后触发进入
+      setTimeout(function(){ cord.style.height = dropH + 'px'; arm.classList.add('claw-grabbing'); try { audioEngine.play('claw_drop'); } catch(e){} }, 650);
+      // 3. 闭合 + 咬合音
+      setTimeout(function(){ arm.classList.remove('claw-grabbing'); arm.classList.add('claw-closed'); try { audioEngine.play('claw_grab'); } catch(e){} }, 1250);
+      // 4. 升起 + 成功庆祝音 + 粒子
+      setTimeout(function(){
+        cord.style.height = '0px';
+        try { audioEngine.play('claw_win'); } catch(e){}
+        // 庆祝粒子
+        spawnClawConfetti(machine, target);
+      }, 1700);
+      // 5. 提示该球高亮,2.9s 后触发进入
       setTimeout(function(){
         arm.classList.remove('claw-closed');
         target.classList.remove('claw-target');
@@ -386,6 +409,28 @@
       }, 2900);
     });
   };
+
+  // 抓取成功庆祝粒子
+  function spawnClawConfetti(machine, target){
+    var rect = target.getBoundingClientRect();
+    var mx = machine.getBoundingClientRect();
+    var cx = rect.left + rect.width/2 - mx.left;
+    var cy = rect.top + rect.height/2 - mx.top;
+    var colors = ['#c9a96e', '#b8a9d4', '#7a8ba0', '#4ecdc4', '#ffb7c5'];
+    for (var k = 0; k < 14; k++) {
+      var p = document.createElement('div');
+      p.className = 'claw-confetti';
+      p.style.left = cx + 'px';
+      p.style.top = cy + 'px';
+      p.style.background = colors[k % colors.length];
+      var ang = (Math.PI * 2 * k) / 14;
+      var dist = 50 + Math.random() * 50;
+      p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+      machine.appendChild(p);
+      (function(el){ setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 900); })(p);
+    }
+  }
 
   // 命运星图:星点散落 + SVG 连线
   var ASTRO_SLOTS = [
@@ -408,6 +453,8 @@
     svg.setAttribute('preserveAspectRatio', 'none');
     map.appendChild(svg);
     map.insertAdjacentHTML('beforeend', '<div class="astro-caption">— 命运的星图,由你点亮 —</div>');
+    // V21: 流星
+    map.insertAdjacentHTML('beforeend', '<div class="astro-meteor"></div>');
 
     var cardsWrap = landing.querySelector('.choice-cards');
     cardsWrap.parentNode.insertBefore(map, cardsWrap);
@@ -446,26 +493,105 @@
     var pairs = [
       [0,1],[1,2],[2,5],[5,4],[4,3],[3,0],[0,5],[1,4]
     ];
-    pairs.forEach(function(p){
+    pairs.forEach(function(p, idx){
       if (!nodes[p[0]] || !nodes[p[1]]) return;
       var line = document.createElementNS(svgNS, 'line');
       line.setAttribute('x1', nodes[p[0]].x); line.setAttribute('y1', nodes[p[0]].y);
       line.setAttribute('x2', nodes[p[1]].x); line.setAttribute('y2', nodes[p[1]].y);
+      // V21: 逐条画出动画 — 初始隐藏,delay 逐条显现
+      line.classList.add('astro-line-draw');
+      line.style.animationDelay = (0.6 + idx * 0.18) + 's';
       svg.appendChild(line);
       lineEls.push({ el: line, a: p[0], b: p[1] });
+      // 连线绘制音
+      (function(d){ setTimeout(function(){ try { audioEngine.play('line_draw'); } catch(e){} }, (0.6 + d * 0.18) * 1000); })(idx);
     });
 
-    // hover 星点:点亮相连的线
+    // hover 星点:点亮星点 + 相连线 + 涟漪 + 音效
     nodes.forEach(function(node, idx){
       node.card.addEventListener('mouseenter', function(){
         lineEls.forEach(function(l){
           if (l.a === idx || l.b === idx) l.el.classList.add('lit');
         });
+        try { audioEngine.play('star_ping'); } catch(e){}
+        spawnAstroRipple(map, node.card);
       });
       node.card.addEventListener('mouseleave', function(){
         lineEls.forEach(function(l){ l.el.classList.remove('lit'); });
       });
     });
+  };
+
+  // 星点涟漪
+  function spawnAstroRipple(map, star){
+    var r = document.createElement('div');
+    r.className = 'astro-ripple';
+    r.style.left = star.style.left;
+    r.style.top = star.style.top;
+    map.appendChild(r);
+    setTimeout(function(){ if (r.parentNode) r.parentNode.removeChild(r); }, 900);
+  }
+
+  // V21: 变体自主切换 — 循环 grid→claw→astro→grid
+  var VARIANT_ORDER = ['ui-grid', 'ui-claw', 'ui-astro'];
+  var VARIANT_LABEL = { 'ui-grid': '殿 堂', 'ui-claw': '抓 取', 'ui-astro': '星 图' };
+  window.cycleLandingVariant = function(){
+    var landing = document.getElementById('landing');
+    if (!landing) return;
+    var current = null;
+    VARIANT_ORDER.forEach(function(v){ if (landing.classList.contains(v)) current = v; });
+    if (!current) current = 'ui-grid';
+    var next = VARIANT_ORDER[(VARIANT_ORDER.indexOf(current) + 1) % VARIANT_ORDER.length];
+
+    // 清理 claw/astro 注入的机台/星图 DOM,并把卡片还原回 .choice-cards
+    landing.querySelectorAll('.claw-machine, .astro-map').forEach(function(el){ el.remove(); });
+    var cardsWrap = landing.querySelector('.choice-cards');
+    // 还原所有卡片:移除 claw-ball/astro-star class 与内联定位,把卡片放回 choice-cards
+    var cards = landing.querySelectorAll('.choice-card');
+    cards.forEach(function(card){
+      card.classList.remove('claw-ball', 'astro-star');
+      card.removeAttribute('style');
+      // astro 变体重组过内部结构,需还原原始结构(图标/era/h2/p)
+      if (!card.querySelector('h2')) {
+        // 极少数情况:astro 重组后 h2 被移除,从 astro-name 还原
+        var nameEl = card.querySelector('.astro-name');
+        var coreEl = card.querySelector('.astro-star-core');
+        var eraEl = card.querySelector('.astro-era');
+        if (nameEl || coreEl || eraEl) {
+          var icon = coreEl ? coreEl.querySelector('.card-icon') : null;
+          var eraText = eraEl ? eraEl.textContent : '';
+          var nameText = nameEl ? nameEl.textContent : '';
+          while (card.firstChild) card.removeChild(card.firstChild);
+          var atm = document.createElement('div'); atm.className = 'card-atmosphere'; card.appendChild(atm);
+          if (icon) card.appendChild(icon);
+          if (eraText) { var e = document.createElement('div'); e.className = 'card-era'; e.textContent = eraText; card.appendChild(e); }
+          if (nameText) { var h = document.createElement('h2'); h.textContent = nameText; card.appendChild(h); }
+        }
+      }
+      if (cardsWrap) cardsWrap.appendChild(card);
+    });
+
+    // 切换 class
+    VARIANT_ORDER.forEach(function(v){ landing.classList.remove(v); });
+    landing.classList.add(next);
+    try { sessionStorage.setItem('landingVariant', next); } catch(e){}
+
+    // 重新初始化对应变体
+    if (next === 'ui-claw' && typeof initClawMachine === 'function') initClawMachine();
+    if (next === 'ui-astro' && typeof initAstroMap === 'function') initAstroMap();
+
+    // 切换音效 + BGM
+    try { audioEngine.play('variant_switch'); } catch(e){}
+    try {
+      if (audioEngine && audioEngine.enabled) {
+        var bgmMap = { 'ui-grid': 'landing_grid', 'ui-claw': 'landing_claw', 'ui-astro': 'landing_astro' };
+        startBGM(bgmMap[next]);
+      }
+    } catch(e){}
+
+    // 更新按钮标签
+    var btn = document.getElementById('variantSwitchBtn');
+    if (btn) btn.textContent = VARIANT_LABEL[next] || '幻 景';
   };
 })();
 </script>
