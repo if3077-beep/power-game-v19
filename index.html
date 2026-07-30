@@ -254,21 +254,211 @@
 <script defer src="M3-Engine.js"></script>
 <script defer src="M6-Mechanics.js"></script>
 <script>
-// V20 R6: 首页 UI 三套变体随机切换 — 现有(grid)20% / 列表变体40% / 沉浸变体40%
+// V20 R6: 首页 UI 三套变体随机切换 — 现有(grid)20% / 抓娃娃机40% / 命运星图40%
+// V21: ui-list→ui-claw(抓娃娃机) / ui-cinematic→ui-astro(命运星图)
 (function pickLandingVariant() {
   const landing = document.getElementById('landing');
   if (!landing) return;
   // V20 R9 (P2-1): 优先读取 sessionStorage 缓存的变体,避免刷新跳变;仅无缓存时随机
   let variant = null;
   try { variant = sessionStorage.getItem('landingVariant'); } catch(e){}
-  if (variant !== 'ui-grid' && variant !== 'ui-list' && variant !== 'ui-cinematic') {
+  // 兼容旧缓存值
+  if (variant === 'ui-list') variant = 'ui-claw';
+  if (variant === 'ui-cinematic') variant = 'ui-astro';
+  if (variant !== 'ui-grid' && variant !== 'ui-claw' && variant !== 'ui-astro') {
     const r = Math.random();
     variant = 'ui-grid'; // 默认 20%
-    if (r >= 0.20 && r < 0.60) variant = 'ui-list';
-    else if (r >= 0.60) variant = 'ui-cinematic';
+    if (r >= 0.20 && r < 0.60) variant = 'ui-claw';
+    else if (r >= 0.60) variant = 'ui-astro';
+    try { sessionStorage.setItem('landingVariant', variant); } catch(e){}
+  } else {
     try { sessionStorage.setItem('landingVariant', variant); } catch(e){}
   }
   landing.classList.add(variant);
+  // 抓娃娃机/命运星图:渲染逻辑在下方脚本块定义,延迟到 DOMContentLoaded 后初始化
+  function _initVariant(){
+    if (variant === 'ui-claw' && typeof initClawMachine === 'function') initClawMachine();
+    if (variant === 'ui-astro' && typeof initAstroMap === 'function') initAstroMap();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _initVariant);
+  } else { _initVariant(); }
+})();
+</script>
+
+<script>
+// V21: 抓娃娃机(ui-claw)与命运星图(ui-astro)变体渲染逻辑
+// 每个道路 .choice-card 的 data-scenario 与 onclick(renderPrelude) 保持不变,只改外观与定位
+(function(){
+  // 道路配色(球/星点光晕)
+  var SCENE_COLOR = {
+    ming:      { c:'rgba(201,169,110,0.32)', g:'rgba(201,169,110,0.55)' },
+    whitehouse:{ c:'rgba(122,139,160,0.32)', g:'rgba(160,180,210,0.55)' },
+    xianjian:  { c:'rgba(184,169,212,0.32)', g:'rgba(184,169,212,0.6)' },
+    ai:        { c:'rgba(78,205,196,0.3)',   g:'rgba(78,205,196,0.55)' },
+    africa:    { c:'rgba(180,140,90,0.32)',  g:'rgba(200,160,100,0.55)' },
+    cyber:     { c:'rgba(196,92,180,0.32)',  g:'rgba(220,120,200,0.55)' },
+    korea:     { c:'rgba(200,150,170,0.3)',  g:'rgba(220,170,190,0.55)' },
+  };
+
+  // 抓娃娃机:7 个预设散落位置(百分比,相对机台),按可见球顺序分配
+  var CLAW_SLOTS = [
+    { x: 18, y: 62 }, { x: 38, y: 72 }, { x: 58, y: 64 }, { x: 78, y: 74 },
+    { x: 28, y: 80 }, { x: 50, y: 82 }, { x: 70, y: 80 },
+  ];
+
+  window.initClawMachine = function(){
+    var landing = document.getElementById('landing');
+    if (!landing) return;
+    var cards = landing.querySelectorAll('.choice-card');
+    if (!cards.length) return;
+
+    // 构建机台
+    var machine = document.createElement('div');
+    machine.className = 'claw-machine';
+    machine.innerHTML =
+      '<div class="claw-rail"></div>' +
+      '<div class="claw-arm" id="clawArm"><div class="claw-cord" id="clawCord"></div><div class="claw-grip"></div></div>' +
+      '<div class="claw-hint">点球进入 · 或按抓取随机选</div>' +
+      '<button class="claw-button" id="clawButton">抓 取</button>';
+
+    // 插入到 choice-cards 之前
+    var cardsWrap = landing.querySelector('.choice-cards');
+    cardsWrap.parentNode.insertBefore(machine, cardsWrap);
+
+    // 球散落:把每个 choice-card 移入机台,加 .claw-ball,分配位置
+    var visible = [];
+    cards.forEach(function(card, i){
+      var sc = card.getAttribute('data-scenario') || 'ming';
+      var col = SCENE_COLOR[sc] || SCENE_COLOR.ming;
+      card.classList.add('claw-ball');
+      card.style.setProperty('--ball-color', col.c);
+      card.style.setProperty('--ball-glow', col.g);
+      machine.appendChild(card);
+      visible.push(card);
+    });
+    // 分配散落位置(可见球数可能 < 7)
+    visible.forEach(function(card, i){
+      var slot = CLAW_SLOTS[i % CLAW_SLOTS.length];
+      card.style.left = slot.x + '%';
+      card.style.top = slot.y + '%';
+      // 错峰漂浮
+      card.style.animationDelay = (i * 0.4) + 's';
+    });
+
+    // 抓取动画
+    var arm = machine.querySelector('#clawArm');
+    var cord = machine.querySelector('#clawCord');
+    var btn = machine.querySelector('#clawButton');
+    var busy = false;
+    btn.addEventListener('click', function(){
+      if (busy) return;
+      busy = true; btn.disabled = true;
+      // 随机选一个可见球作为目标
+      var target = visible[Math.floor(Math.random() * visible.length)];
+      var targetLeft = parseFloat(target.style.left);
+      var targetTop = parseFloat(target.style.top);
+      // 1. 爪子移到目标正上方(轨道 top 16px, 用 left% 定位)
+      arm.style.left = targetLeft + '%';
+      target.classList.add('claw-target');
+      // 2. 下降(cord 高度 = 球 top - 轨道)
+      var dropH = (targetTop / 100) * 480 - 16;
+      setTimeout(function(){ cord.style.height = dropH + 'px'; arm.classList.add('claw-grabbing'); }, 650);
+      // 3. 闭合
+      setTimeout(function(){ arm.classList.remove('claw-grabbing'); arm.classList.add('claw-closed'); }, 1250);
+      // 4. 升起
+      setTimeout(function(){ cord.style.height = '0px'; }, 1700);
+      // 5. 提示该球高亮,2.6s 后触发进入
+      setTimeout(function(){
+        arm.classList.remove('claw-closed');
+        target.classList.remove('claw-target');
+        // 模拟点击进入该道路
+        target.click();
+        busy = false; btn.disabled = false;
+      }, 2900);
+    });
+  };
+
+  // 命运星图:星点散落 + SVG 连线
+  var ASTRO_SLOTS = [
+    { x: 22, y: 28 }, { x: 50, y: 18 }, { x: 78, y: 30 },
+    { x: 30, y: 58 }, { x: 62, y: 64 }, { x: 44, y: 82 }, { x: 80, y: 78 },
+  ];
+
+  window.initAstroMap = function(){
+    var landing = document.getElementById('landing');
+    if (!landing) return;
+    var cards = landing.querySelectorAll('.choice-card');
+    if (!cards.length) return;
+
+    var map = document.createElement('div');
+    map.className = 'astro-map';
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'astro-lines');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    map.appendChild(svg);
+    map.insertAdjacentHTML('beforeend', '<div class="astro-caption">— 命运的星图,由你点亮 —</div>');
+
+    var cardsWrap = landing.querySelector('.choice-cards');
+    cardsWrap.parentNode.insertBefore(map, cardsWrap);
+
+    var nodes = []; // {card, x, y}
+    cards.forEach(function(card, i){
+      var sc = card.getAttribute('data-scenario') || 'ming';
+      var slot = ASTRO_SLOTS[i % ASTRO_SLOTS.length];
+      card.classList.add('astro-star');
+      card.style.left = slot.x + '%';
+      card.style.top = slot.y + '%';
+
+      // 重组内部结构:图标→astro-star-core,标题→astro-name,era→astro-era
+      var icon = card.querySelector('.card-icon');
+      var h2 = card.querySelector('h2');
+      var era = card.querySelector('.card-era');
+      var core = document.createElement('div');
+      core.className = 'astro-star-core';
+      if (icon) core.appendChild(icon);
+      var name = document.createElement('div');
+      name.className = 'astro-name';
+      if (h2) name.textContent = h2.textContent;
+      var eraEl = document.createElement('div');
+      eraEl.className = 'astro-era';
+      if (era) eraEl.textContent = era.textContent;
+      // 清空原内容,填入新结构
+      while (card.firstChild) card.removeChild(card.firstChild);
+      card.appendChild(core); card.appendChild(name); card.appendChild(eraEl);
+
+      map.appendChild(card);
+      nodes.push({ card: card, x: slot.x, y: slot.y });
+    });
+
+    // 连线:按顺序连成星座(环形 + 部分交叉)
+    var lineEls = [];
+    var pairs = [
+      [0,1],[1,2],[2,5],[5,4],[4,3],[3,0],[0,5],[1,4]
+    ];
+    pairs.forEach(function(p){
+      if (!nodes[p[0]] || !nodes[p[1]]) return;
+      var line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('x1', nodes[p[0]].x); line.setAttribute('y1', nodes[p[0]].y);
+      line.setAttribute('x2', nodes[p[1]].x); line.setAttribute('y2', nodes[p[1]].y);
+      svg.appendChild(line);
+      lineEls.push({ el: line, a: p[0], b: p[1] });
+    });
+
+    // hover 星点:点亮相连的线
+    nodes.forEach(function(node, idx){
+      node.card.addEventListener('mouseenter', function(){
+        lineEls.forEach(function(l){
+          if (l.a === idx || l.b === idx) l.el.classList.add('lit');
+        });
+      });
+      node.card.addEventListener('mouseleave', function(){
+        lineEls.forEach(function(l){ l.el.classList.remove('lit'); });
+      });
+    });
+  };
 })();
 </script>
 
