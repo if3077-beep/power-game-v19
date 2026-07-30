@@ -2528,7 +2528,13 @@ function makeChoice(index) {
   // V14: 隐藏道路不累积人情债
   if (!state.isHidden) {
     addDebt(choice.debtPhrase, choice.debtCategory, state.currentScene);
-    if (choice.channelEffect < 0) loseChannel(choice.debtPhrase);
+    if (choice.channelEffect < 0) {
+      loseChannel(choice.debtPhrase);
+    } else if (choice.channelEffect > 0) {
+      // V21 [0a]: 补正正数分支——此前主场景只扣不加,导致渠道恒下行,调性轴无法上行
+      state.channels = Math.max(0, Math.min(8, state.channels + choice.channelEffect));
+      renderChannels();
+    }
   } else {
     // 隐藏道路只记录选择，不扣渠道
     state.debts.push({ text: choice.debtPhrase, category: choice.debtCategory, scene: state.currentScene });
