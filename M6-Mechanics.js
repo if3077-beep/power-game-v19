@@ -1549,10 +1549,17 @@ function renderScene() {
   // 应用历史联动效果
   const scene = applyHistoryEffects(rawScene, state.scenario);
 
-  // 随机文本变体（每次游玩不同）
+  // V21 [L1]: textVariants 按渠道档选择——低档冷峻/高档壮烈/中档默认
   if (scene.textVariants && scene.textVariants.length > 0) {
-    const allTexts = [scene.text, ...scene.textVariants];
-    scene.text = allTexts[Math.floor(Math.random() * allTexts.length)];
+    const ch = state.channels;
+    let picked = scene.text; // 默认中档
+    if (ch <= 1 && scene.textVariants.length >= 1) {
+      picked = scene.textVariants[0];                              // 孤冷档
+    } else if (ch >= 6 && scene.textVariants.length >= 2) {
+      picked = scene.textVariants[scene.textVariants.length - 1];  // 壮烈档
+    }
+    // 中档(2-5) 或 variant 不足 → 保留默认 scene.text
+    scene.text = picked;
   }
 
   // V21 [0b]: applyHistoryEffects 的追加文本走独立字段,不进 textVariants 随机池
