@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>权力的游戏 v20</title>
+<title>权力的游戏 v20.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700&family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -11,14 +11,27 @@
 </head>
 <body>
 
-<div id="appLoader" style="position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1612,#0a0806);font-family:serif;transition:opacity 0.6s ease;">
-  <div style="text-align:center;">
-    <div style="width:36px;height:36px;border:2px solid rgba(201,169,110,0.2);border-top-color:#c9a96e;border-radius:50%;margin:0 auto 1.5rem;animation:loaderSpin 0.8s linear infinite;"></div>
-    <div style="font-size:0.85rem;color:#8a7a5a;letter-spacing:0.15em;">权力的游戏</div>
-    <div style="font-size:0.65rem;color:#5a4a3a;margin-top:0.4rem;">加载中...</div>
+<div id="appLoader" style="position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1612,#0a0806);font-family:serif;transition:opacity 0.8s ease;">
+  <div style="text-align:center;position:relative;">
+    <div class="loader-ink"></div>
+    <div style="font-size:0.85rem;color:#8a7a5a;letter-spacing:0.25em;margin-top:2.5rem;opacity:0;animation:loaderTextIn 0.8s ease-out 0.6s forwards;">权 力 的 游 戏</div>
   </div>
 </div>
-<style>@keyframes loaderSpin{to{transform:rotate(360deg)}}</style>
+<style>
+@keyframes loaderInkSpread{
+  0%{transform:scale(0);opacity:0;filter:blur(0);}
+  30%{opacity:0.9;filter:blur(2px);}
+  70%{transform:scale(1);opacity:0.6;filter:blur(8px);}
+  100%{transform:scale(2.4);opacity:0;filter:blur(20px);}
+}
+@keyframes loaderTextIn{from{opacity:0;transform:translateY(8px);letter-spacing:0.4em;}to{opacity:0.85;transform:translateY(0);letter-spacing:0.25em;}}
+.loader-ink{
+  width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(circle at 45% 45%,#c9a96e,rgba(201,169,110,0.4) 40%,transparent 70%);
+  margin:0 auto;
+  animation:loaderInkSpread 1.6s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+</style>
 <canvas id="particles"></canvas>
 <div id="cursorGlow"></div>
 <div class="fate-river-wrap" id="fateRiverWrap"><canvas id="fateRiverCanvas"></canvas></div>
@@ -210,16 +223,16 @@
   window.addEventListener('DOMContentLoaded', function(){
     setTimeout(function(){
       var failed = window.__moduleCheck();
-      // 先隐藏加载指示器
+      // V20.3: 延长 loader 到水墨开幕动画跑完(1.6s),再淡出衔接 landing 入场
       var loader = document.getElementById('appLoader');
-      if (loader) { loader.style.opacity = '0'; setTimeout(function(){ if(loader.parentNode) loader.parentNode.removeChild(loader); }, 600); }
+      if (loader) { loader.style.opacity = '0'; setTimeout(function(){ if(loader.parentNode) loader.parentNode.removeChild(loader); }, 800); }
       if (failed.length > 0) {
         console.error('[ModuleGuard] 加载失败的模块:', failed);
         window.__showModuleError(failed);
       } else {
         console.log('[ModuleGuard] 所有关键模块加载完成 ✓');
       }
-    }, 100);
+    }, 1100);
   });
 })();
 </script>

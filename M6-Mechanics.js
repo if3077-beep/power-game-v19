@@ -1273,9 +1273,12 @@ function renderPrelude(scenarioKey) {
       <div class="prelude-suspense">${prelude.suspense}</div>
     </div>
   `;
-  showScreen('prelude-screen');
-  audioEngine.play('chapter');
-  startBGM('prelude');
+  // V20.3: 加水墨转场,与 showIntro 一致(此前 prelude 从 landing 直接切换,无过渡)
+  transition(() => {
+    showScreen('prelude-screen');
+    audioEngine.play('chapter');
+    startBGM('prelude');
+  });
 
   // 阶段2：2秒后显示两难选择
   setTimeout(() => {
