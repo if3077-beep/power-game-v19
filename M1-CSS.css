@@ -760,7 +760,7 @@ body.theme-chaos .gallery-card.unlocked:hover{box-shadow:0 12px 40px rgba(0,0,0,
 
 /* ====== V21.2: 悬浮继续按钮 — 滚动隐藏/静止出现,按道路主题配色 ====== */
 .floating-continue-btn{
-  position:fixed;left:50%;bottom:1.6rem;transform:translateX(-50%) translateY(20px);
+  position:fixed;left:50%;bottom:2.6rem;transform:translateX(-50%) translateY(20px);
   z-index:90;display:flex;align-items:center;gap:0.5rem;
   padding:0.85rem 2.1rem;border-radius:2.4rem;cursor:pointer;
   background:linear-gradient(135deg,rgba(20,18,14,0.92),rgba(10,8,6,0.92));
@@ -792,7 +792,7 @@ body.theme-chaos .gallery-card.unlocked:hover{box-shadow:0 12px 40px rgba(0,0,0,
 .floating-continue-btn:hover:not(.hide):not(.scroll-hide) .fc-arrow{transform:translateX(4px);}
 .floating-continue-btn .ripple-effect{background:rgba(201,169,110,0.2);}
 @media(max-width:600px){
-  .floating-continue-btn{bottom:1.1rem;padding:0.72rem 1.7rem;font-size:0.84rem;letter-spacing:0.14em;}
+  .floating-continue-btn{bottom:2.0rem;padding:0.72rem 1.7rem;font-size:0.84rem;letter-spacing:0.14em;}
 }
 /* V21.2: 各道路主题配色 — 边框/文字/光晕用 --accent-w(已在各 theme-xxx 定义) */
 body.theme-whitehouse .floating-continue-btn{box-shadow:0 14px 40px rgba(0,0,0,0.5),0 0 24px rgba(201,169,110,0.2),inset 0 1px 0 rgba(255,255,255,0.06);}
