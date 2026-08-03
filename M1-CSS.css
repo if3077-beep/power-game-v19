@@ -758,6 +758,14 @@ body.theme-chaos .gallery-card.unlocked:hover{box-shadow:0 12px 40px rgba(0,0,0,
 /* ====== V7: 选项按钮点击涟漪增强 ====== */
 .choice-btn .ripple-effect{background:rgba(201,169,110,0.15);}
 
+/* ====== V21.7: 未选选项收纳动画 — 高斯模糊后优雅收起 ====== */
+@keyframes choiceCollapseOut{
+  0%{opacity:0.2;filter:blur(1px);transform:scale(1) translateY(0);max-height:200px;margin-bottom:0.5rem;padding-top:1.2rem;padding-bottom:1.2rem;}
+  40%{opacity:0.12;filter:blur(3px);transform:scale(0.96) translateY(-4px);}
+  100%{opacity:0;filter:blur(6px);transform:scale(0.82) translateY(-12px);max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0;border-width:0;}
+}
+.choice-btn.collapse-out{animation:choiceCollapseOut 0.7s var(--ease-out-expo) forwards;pointer-events:none;overflow:hidden;}
+
 /* ====== V21.2: 悬浮继续按钮 — 滚动隐藏/静止出现,按道路主题配色 ====== */
 .floating-continue-btn{
   position:fixed;left:50%;bottom:2.6rem;transform:translateX(-50%) translateY(20px);
@@ -773,9 +781,14 @@ body.theme-chaos .gallery-card.unlocked:hover{box-shadow:0 12px 40px rgba(0,0,0,
   transition:opacity 0.4s var(--ease-out-expo),transform 0.4s var(--ease-out-expo),box-shadow 0.3s ease,background 0.3s ease;
   will-change:transform,opacity;
 }
-.floating-continue-btn.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
-.floating-continue-btn.hide{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(20px);}
-.floating-continue-btn.scroll-hide{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(28px);transition:opacity 0.18s ease,transform 0.18s ease;}
+.floating-continue-btn.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);animation:fcGlow 2.8s ease-in-out 0.4s infinite;}
+/* V21.7: 继续按钮轻微发光呼吸 */
+@keyframes fcGlow{
+  0%,100%{box-shadow:0 14px 40px rgba(0,0,0,0.5),0 0 18px rgba(201,169,110,0.18),inset 0 1px 0 rgba(255,255,255,0.06);}
+  50%{box-shadow:0 14px 40px rgba(0,0,0,0.5),0 0 32px rgba(201,169,110,0.38),inset 0 1px 0 rgba(255,255,255,0.1);}
+}
+.floating-continue-btn.hide{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(20px);animation:none;}
+.floating-continue-btn.scroll-hide{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(28px);transition:opacity 0.18s ease,transform 0.18s ease;animation:none;}
 .floating-continue-btn .fc-arrow{font-size:1.05rem;line-height:1;opacity:0.85;transition:transform 0.3s var(--ease-out-expo);}
 .floating-continue-btn .fc-text{position:relative;}
 .floating-continue-btn::before{

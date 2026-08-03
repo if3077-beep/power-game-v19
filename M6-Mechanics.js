@@ -2644,6 +2644,27 @@ function getChannelWindfallEvent(scenarioKey) {
   return eligible[Math.floor(Math.random() * eligible.length)];
 }
 
+// --- V21.7: 统一选项处理 — 选中高亮,未选先模糊再优雅收纳 ---
+function settleChoices(selectedIndex) {
+  const btns = document.querySelectorAll('.choices-container .choice-btn');
+  btns.forEach((b, j) => {
+    b.style.pointerEvents = 'none';
+    if (j === selectedIndex) {
+      b.classList.add('clicked');
+      b.style.opacity = '1';
+    } else {
+      // 先高斯模糊淡出,延迟后触发收纳动画
+      b.style.opacity = '0.2';
+      b.style.filter = 'blur(1px)';
+      setTimeout(() => {
+        if (!b || !b.parentNode) return;
+        b.classList.add('collapse-out');
+        setTimeout(() => { if (b && b.parentNode) b.style.display = 'none'; }, 700);
+      }, 450);
+    }
+  });
+}
+
 // --- 做出选择 ---
 function makeChoice(index) {
   const sc = scenarios[state.scenario];
@@ -2748,16 +2769,7 @@ function makeChoice(index) {
     });
   }
 
-  document.querySelectorAll('.choices-container .choice-btn').forEach((btn, i) => {
-    btn.style.pointerEvents = 'none';
-    if (i === index) {
-      btn.classList.add('clicked');
-      btn.style.opacity = '1';
-    } else {
-      btn.style.opacity = '0.2';
-      btn.style.filter = 'blur(1px)';
-    }
-  });
+  settleChoices(index);
 
   // 分析引擎洞察 — 场景专属权力动力学 + 通用分析
   let insightHTML = '';
@@ -3769,11 +3781,7 @@ function renderRandomEvent() {
             // V19 R4.5: 保存会话(刷新可恢复)
             try { saveSession(); } catch(e) {}
 
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; }
-              else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
 
             const consequenceEl = document.createElement('div');
             consequenceEl.className = 'consequence-box';
@@ -4008,11 +4016,7 @@ function renderChannelCrisis(event) {
             }
             if (choice.channelEffect < 0) loseChannel(choice.debtPhrase);
 
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; }
-              else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
 
             const consequenceEl = document.createElement('div');
             consequenceEl.className = 'consequence-box';
@@ -4107,11 +4111,7 @@ function renderChannelWindfall(event) {
             }
             if (choice.channelEffect < 0) loseChannel(choice.debtPhrase);
 
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; }
-              else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
 
             const consequenceEl = document.createElement('div');
             consequenceEl.className = 'consequence-box';
@@ -4475,11 +4475,7 @@ function renderFinalEvent() {
             addDebt(choice.debtPhrase, choice.debtCategory, state.currentScene);
             if (choice.channelEffect < 0) loseChannel(choice.debtPhrase);
 
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; }
-              else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
 
             const consequenceEl = document.createElement('div');
             consequenceEl.className = 'consequence-box';
@@ -5450,10 +5446,7 @@ function renderDream() {
             audioEngine.play('click');
             addDebt(choice.debtPhrase, choice.debtCategory, state.currentScene);
             try { saveSession(); } catch(e) {}
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; } else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
             const conEl = document.createElement('div');
             conEl.className = 'consequence-box dream-consequence';
             conEl.innerHTML = `<div class="consequence-glow"></div><div class="consequence-label">梦境 · 回响</div><div class="consequence-text">${choice.consequence}</div><div class="debt-added">梦境人情债：「${choice.debtPhrase}」</div>`;
@@ -5573,10 +5566,7 @@ function renderForeshadowEvent(evt) {
             audioEngine.play('click');
             addDebt(choice.debtPhrase, choice.debtCategory, state.currentScene);
             try { saveSession(); } catch(e) {}
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; } else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
             const conEl = document.createElement('div');
             conEl.className = 'consequence-box foreshadow-consequence';
             conEl.innerHTML = `<div class="consequence-glow"></div><div class="consequence-label">插曲 · 余韵</div><div class="consequence-text">${choice.consequence}</div>`;
@@ -5773,10 +5763,7 @@ function renderCalibrateEvent(evt) {
             if (choice.channelEffect) state.channels = Math.max(0, Math.min(8, state.channels + choice.channelEffect));
             addDebt(choice.debtPhrase, choice.debtCategory, state.currentScene);
             try { saveSession(); } catch(e) {}
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; } else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
             const conEl = document.createElement('div');
             conEl.className = 'consequence-box foreshadow-consequence';
             conEl.innerHTML = `<div class="consequence-glow"></div><div class="consequence-label">回响 · 余音</div><div class="consequence-text">${choice.consequence}</div>`;
@@ -6270,10 +6257,7 @@ function renderAgentQuest(act) {
             state._agentQuestChoices = state._agentQuestChoices || [];
             state._agentQuestChoices.push(choice.questEnding || choice.next);
             try { saveSession(); } catch(e) {}
-            document.querySelectorAll('.choices-container .choice-btn').forEach((b, j) => {
-              b.style.pointerEvents = 'none';
-              if (j === i) { b.classList.add('clicked'); b.style.opacity = '1'; } else { b.style.opacity = '0.2'; b.style.filter = 'blur(1px)'; }
-            });
+            settleChoices(i);
             const conEl = document.createElement('div');
             conEl.className = 'consequence-box foreshadow-consequence';
             conEl.innerHTML = `<div class="consequence-glow"></div><div class="consequence-label">支线 · 演化</div><div class="consequence-text">${choice.consequence}</div>`;
