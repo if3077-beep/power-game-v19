@@ -4892,6 +4892,7 @@ function getEndingUnlockHint(endingId) {
     'chaos_exile': '以「利己」为先导4次以上，选择自我放逐',
     'chaos_harmonizer': '用最少的决定（≤10次）织出最大的网',
     'chaos_early_silence': '在时空风暴最深处选择沉默退出',
+    'chaos_true': '让三块残卷在广场拼合——三票合一，真结局',
     'chaos_default': '用你独一无二的方式穿过混沌之渊',
     // 仙剑奇侠传三
     'xj_guardian': '坚持「守护」型选择3次以上,且保持消息渠道≥2——回永安当守一方太平',
@@ -4918,22 +4919,26 @@ function renderGalleryContent(tab) {
   const totalEndings = Object.values(scenarios).reduce((s, sc) => s + sc.endings.length, 0);
   const pct = totalEndings > 0 ? Math.round(totalUnlocked / totalEndings * 100) : 0;
 
+  const chaosUnlocked = !!safeStorage.get('chaosUnlocked');
   const unlockHints = {
-    whitehouse: '在白宫的权力漩涡中做出你的选择。每条道路有多个结局，取决于你的债务类型分布。',
-    ming: '在大明官场的夹缝中求生。你的每一次选择都在累积人情债——债务类型决定了你的结局。',
+    whitehouse: '金权漩涡，八幕二十四小时。每个建议都在改写历史——债务类型，决定你停在哪一页。',
+    ming: '七品知县，两本账册。人情债如蛛网，站队即生死——你能在万历朝活几集？',
+    xianjian: '六界三生，一剑一剑走完。选择类型分布，决定你是守护者、客卿，还是游侠。',
     ai: aiUnlocked
-      ? '在2036年的人机共生时代，你的选择将定义两个物种的未来。注意：第4幕之后可能触发提前退出。'
-      : '🔒 首次通关「白宫的一天」或「大明官场」后解锁此道路。',
+      ? '2036，人机共生。你的每个判决定义两个物种的边界——第4幕后，可能提前离场。'
+      : '🔒 通关「白宫」或「大明」任一道路后，此处亮起。',
     africa: africaUnlocked
-      ? '在异星上为人类和兽群找到共存的方式。没有人情债，只有选择。'
-      : '🔒 在白宫道路中做出一个关乎「非我族类」的选择后解锁。',
+      ? '异星之上，双语使者。没有对错，只有——你愿不愿替另一个物种开口。'
+      : '🔒 在白宫道路中触碰「非我族类」的抉择后解锁。',
     cyber: cyberUnlocked
-      ? '在3077年的赛博贫民窟中挣扎求生。没有人情债，只有生存。'
-      : '🔒 在AI道路中见证一次「觉醒」事件后解锁。',
+      ? '3077，下城区黑市。公司、领主、革命者——能活到天亮，就是今天的胜利。'
+      : '🔒 在共生时代见证一次「觉醒」事件后解锁。',
     korea: koreaUnlocked
-      ? '在首尔的日常中找到属于自己的节奏。没有人情债，只有人生。'
-      : '🔒 在大明道路中融入官场的人情网后解锁。',
-    xianjian: '六界冒险,三生三世。你的选择类型分布,决定你是守护者、客卿,还是游侠。'
+      ? '首尔，25岁，咖啡店打工。没有主线，只有今天怎么过——日常也是一种道路。'
+      : '🔒 在大明道路融入官场人情网后解锁。',
+    chaos: chaosUnlocked
+      ? '三时代交汇之渊。明朝奏折、白宫简报、AI核心同桌——你的每个选择在三时同时回响。'
+      : '🌀 集齐三枚时空碎片，或于图鉴页解锁全部后显现。'
   };
 
   const tabs = [
@@ -4944,6 +4949,7 @@ function renderGalleryContent(tab) {
     { key: 'africa', label: '🌍 非洲之心', unlocked: africaUnlocked },
     { key: 'cyber', label: '⚡ 3077', unlocked: cyberUnlocked },
     { key: 'korea', label: '🌸 日常投影', unlocked: koreaUnlocked },
+    { key: 'chaos', label: '🌀 时空之渊', unlocked: chaosUnlocked },
   ];
 
   // 每条道路的解锁进度
@@ -4954,7 +4960,7 @@ function renderGalleryContent(tab) {
     roadProgress[t.key] = { done, total };
   });
 
-  const isRoadUnlocked = { whitehouse: true, ming: true, xianjian: true, ai: aiUnlocked, africa: africaUnlocked, cyber: cyberUnlocked, korea: koreaUnlocked };
+  const isRoadUnlocked = { whitehouse: true, ming: true, xianjian: true, ai: aiUnlocked, africa: africaUnlocked, cyber: cyberUnlocked, korea: koreaUnlocked, chaos: chaosUnlocked };
   const rp = roadProgress[tab];
 
   screen.innerHTML = `
@@ -5026,11 +5032,10 @@ function showEndingDetail(endingId, scenarioKey) {
 
 // V14.1: 全解锁选项
 function unlockAllEndings() {
-  if (!confirm('解锁前三个道路的全部结局？（隐藏道路需自行探索）')) return;
-  ['ai'].forEach(road => safeStorage.set(road + 'Unlocked', 'true'));
+  if (!confirm('解锁全部道路的全部结局？（含混沌之渊）')) return;
+  ['ai','africa','cyber','korea','chaos'].forEach(road => safeStorage.set(road + 'Unlocked', 'true'));
   const allEndings = {};
   Object.entries(scenarios).forEach(([key, sc]) => {
-    if (!['whitehouse', 'ming', 'ai'].includes(key)) return;
     allEndings[key] = sc.endings.map(e => e.id);
   });
   safeStorage.setJSON('unlockedEndings', allEndings);

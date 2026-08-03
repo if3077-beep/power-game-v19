@@ -1632,6 +1632,106 @@ body.theme-xianjian .theme-bg-layer{background:radial-gradient(ellipse at 50% 25
 /* 锁定卡片 — card-atmosphere 隐藏 */
 .locked-road .card-atmosphere{opacity:0 !important;animation:none !important;}
 
+/* ====== V21.6: 主页卡片边框纹理 — 每条道路独立风格(idle 即可见, hover 增强) ====== */
+/* 用多层 box-shadow 模拟边框纹理,避免 border-image 与圆角冲突 */
+.choice-card[data-scenario="whitehouse"]:not(.locked-road){
+  border:1px solid rgba(201,169,110,0.28);
+  box-shadow:inset 0 0 0 1px rgba(201,169,110,0.08),inset 0 1px 0 rgba(255,235,180,0.06),0 8px 30px rgba(0,0,0,0.25);
+}
+.choice-card[data-scenario="whitehouse"]:not(.locked-road)::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent 10%,rgba(201,169,110,0.55) 30%,rgba(255,215,140,0.7) 50%,rgba(201,169,110,0.55) 70%,transparent 90%);
+  opacity:0.7;
+}
+/* 大明 — 水墨赭石,左侧浓墨竖纹+底部洇染 */
+.choice-card[data-scenario="ming"]:not(.locked-road){
+  border:1px solid rgba(139,69,19,0.25);
+  box-shadow:inset 3px 0 0 -1px rgba(139,69,19,0.35),inset 0 0 18px rgba(139,69,19,0.04),0 8px 30px rgba(0,0,0,0.25);
+}
+.choice-card[data-scenario="ming"]:not(.locked-road)::before{
+  content:'';position:absolute;left:0;top:10%;width:2px;height:80%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(139,69,19,0.5) 25%,rgba(101,50,15,0.3) 60%,transparent);
+  filter:blur(0.5px);opacity:0.8;
+}
+/* AI — 青色电路,顶边扫描线+四角节点 */
+.choice-card[data-scenario="ai"]:not(.locked-road){
+  border:1px solid rgba(78,205,196,0.25);
+  box-shadow:inset 0 0 0 1px rgba(78,205,196,0.06),0 8px 30px rgba(0,0,0,0.25);
+}
+.choice-card[data-scenario="ai"]:not(.locked-road)::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:1px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0,transparent 8px,rgba(78,205,196,0.5) 8px,rgba(78,205,196,0.5) 11px);
+  opacity:0.6;
+}
+.choice-card[data-scenario="ai"]:not(.locked-road)::after{
+  content:'';position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;
+  background:#4ecdc4;box-shadow:0 0 8px rgba(78,205,196,0.6);pointer-events:none;
+  animation:aiNodeBlink 2.4s ease-in-out infinite;
+}
+@keyframes aiNodeBlink{0%,100%{opacity:0.3;}50%{opacity:1;}}
+/* 仙剑 — 蓝紫剑光,双边框+底部剑穗 */
+.choice-card[data-scenario="xianjian"]:not(.locked-road){
+  border:1px solid rgba(122,139,184,0.3);
+  box-shadow:inset 0 0 0 1px rgba(168,155,200,0.1),inset 0 -2px 12px rgba(122,139,184,0.05),0 8px 30px rgba(0,0,0,0.25);
+}
+.choice-card[data-scenario="xianjian"]:not(.locked-road)::before{
+  content:'';position:absolute;bottom:0;left:30%;width:40%;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#8fa8c4,#a89bc8,transparent);
+  box-shadow:0 0 10px rgba(122,139,184,0.5);opacity:0.7;
+}
+/* 非洲 — 暖土绿金,粗细双线+部落几何点 */
+.choice-card[data-scenario="africa"]:not(.locked-road){
+  border:1px solid rgba(107,143,113,0.28);
+  box-shadow:inset 0 0 0 2px rgba(201,160,108,0.06),inset 0 0 20px rgba(107,143,113,0.03),0 8px 30px rgba(0,0,0,0.25);
+}
+.choice-card[data-scenario="africa"]:not(.locked-road)::before{
+  content:'';position:absolute;top:8px;left:8px;width:6px;height:6px;border-radius:50%;
+  background:rgba(201,160,108,0.5);box-shadow:12px 0 0 rgba(107,143,113,0.4),24px 0 0 rgba(201,160,108,0.3);pointer-events:none;
+}
+/* 赛博 — 霓虹红青,断续边框+故障扫描 */
+.choice-card[data-scenario="cyber"]:not(.locked-road){
+  border:1px solid rgba(255,107,107,0.28);
+  box-shadow:inset 0 0 0 1px rgba(78,205,196,0.08),0 8px 30px rgba(0,0,0,0.25);
+}
+.choice-card[data-scenario="cyber"]:not(.locked-road)::before{
+  content:'';position:absolute;top:-1px;left:0;width:100%;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0%,#ff6b6b 15%,transparent 18%,transparent 40%,#4ecdc4 55%,transparent 58%,transparent 80%,#ff6b6b 95%,transparent 100%);
+  opacity:0.7;
+}
+/* 韩国 — 樱花淡粉,细线+右上花瓣点 */
+.choice-card[data-scenario="korea"]:not(.locked-road){
+  border:1px solid rgba(155,142,196,0.22);
+  box-shadow:inset 0 0 0 1px rgba(255,183,197,0.06),0 8px 30px rgba(0,0,0,0.2);
+}
+.choice-card[data-scenario="korea"]:not(.locked-road)::before{
+  content:'';position:absolute;top:10px;right:12px;width:5px;height:5px;border-radius:50%;
+  background:rgba(255,183,197,0.5);box-shadow:-9px 4px 0 -1px rgba(255,183,197,0.35),-4px 9px 0 -1px rgba(155,142,196,0.3);pointer-events:none;
+}
+/* 混沌 — 多彩流转,渐变边框呼吸 */
+.choice-card[data-scenario="chaos"]:not(.locked-road){
+  border:1px solid rgba(184,169,212,0.3);
+  box-shadow:inset 0 0 0 1px rgba(201,169,110,0.08),0 8px 30px rgba(0,0,0,0.25);
+  animation:chaosBorderShift 6s ease-in-out infinite;
+}
+@keyframes chaosBorderShift{
+  0%,100%{border-color:rgba(184,169,212,0.3);box-shadow:inset 0 0 0 1px rgba(201,169,110,0.08),0 8px 30px rgba(0,0,0,0.25);}
+  33%{border-color:rgba(201,169,110,0.35);box-shadow:inset 0 0 0 1px rgba(78,205,196,0.1),0 8px 30px rgba(0,0,0,0.25);}
+  66%{border-color:rgba(78,205,196,0.3);box-shadow:inset 0 0 0 1px rgba(184,169,212,0.1),0 8px 30px rgba(0,0,0,0.25);}
+}
+.choice-card[data-scenario="chaos"]:not(.locked-road)::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#c9a96e,#b8a9d4,#4ecdc4,transparent);
+  opacity:0.6;
+}
+/* hover 时增强边框纹理亮度 */
+.choice-card[data-scenario="whitehouse"]:hover{border-color:rgba(201,169,110,0.55);}
+.choice-card[data-scenario="ming"]:hover{border-color:rgba(139,69,19,0.5);}
+.choice-card[data-scenario="ai"]:hover{border-color:rgba(78,205,196,0.5);}
+.choice-card[data-scenario="xianjian"]:hover{border-color:rgba(122,139,184,0.55);}
+.choice-card[data-scenario="africa"]:hover{border-color:rgba(107,143,113,0.5);}
+.choice-card[data-scenario="cyber"]:hover{border-color:rgba(255,107,107,0.5);}
+.choice-card[data-scenario="korea"]:hover{border-color:rgba(155,142,196,0.45);}
+
 /* ====== V14.3: 明亮主题道路 ====== */
 /* 韩国 — 温暖奶油调 */
 body.theme-korea-bright{--bg:#faf8f5;--text:#3a3530;--muted:#8a8078;--accent-w:#9b8ec4;--glass:rgba(0,0,0,0.03);--glass-border:rgba(0,0,0,0.08);--card-bg:rgba(0,0,0,0.02);--scroll-bg:rgba(250,248,245,0.95);}
