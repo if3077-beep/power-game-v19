@@ -52,17 +52,32 @@ window.showFloatingContinue = function(label, onClick, opts) {
   btn.querySelector('.fc-text').textContent = label || '继续';
   btn.onclick = function(e) {
     if (typeof createRipple === 'function') createRipple(e, btn);
-    window.hideFloatingContinue();
-    if (typeof onClick === 'function') setTimeout(onClick, 120);
+    // V21.8: 按压动效 — 先收缩回弹,再触发消失动画
+    btn.classList.add('pressing');
+    btn.classList.remove('show');
+    setTimeout(() => {
+      btn.classList.remove('pressing');
+      btn.classList.add('dissolving');
+      setTimeout(() => {
+        btn.classList.remove('dissolving');
+        btn.classList.add('hide');
+      }, 400);
+    }, 140);
+    if (typeof onClick === 'function') setTimeout(onClick, 540);
   };
-  btn.classList.remove('hide');
+  btn.classList.remove('hide', 'dissolving', 'pressing');
   requestAnimationFrame(function() { btn.classList.add('show'); });
   if (opts && opts.persist) btn.dataset.persist = '1'; else delete btn.dataset.persist;
 };
 window.hideFloatingContinue = function() {
   if (!_floatingBtn) return;
-  _floatingBtn.classList.remove('show');
-  _floatingBtn.classList.add('hide');
+  _floatingBtn.classList.remove('show', 'pressing');
+  _floatingBtn.classList.add('dissolving');
+  setTimeout(() => {
+    if (!_floatingBtn) return;
+    _floatingBtn.classList.remove('dissolving');
+    _floatingBtn.classList.add('hide');
+  }, 400);
   delete _floatingBtn.dataset.persist;
 };
 window.addEventListener('scroll', () => {
