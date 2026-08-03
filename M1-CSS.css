@@ -760,11 +760,11 @@ body.theme-chaos .gallery-card.unlocked:hover{box-shadow:0 12px 40px rgba(0,0,0,
 
 /* ====== V21.7: 未选选项收纳动画 — 高斯模糊后优雅收起 ====== */
 @keyframes choiceCollapseOut{
-  0%{opacity:0.2;filter:blur(1px);transform:scale(1) translateY(0);max-height:200px;margin-bottom:0.5rem;padding-top:1.2rem;padding-bottom:1.2rem;}
-  40%{opacity:0.12;filter:blur(3px);transform:scale(0.96) translateY(-4px);}
-  100%{opacity:0;filter:blur(6px);transform:scale(0.82) translateY(-12px);max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0;border-width:0;}
+  0%{opacity:0.2;filter:blur(1px);transform:scale(1) translateY(0);max-height:240px;margin-top:0;margin-bottom:0.5rem;padding:1.2rem 1.5rem;border-width:1px;}
+  30%{opacity:0.1;filter:blur(4px);transform:scale(0.9) translateY(-8px);}
+  100%{opacity:0;filter:blur(10px);transform:scale(0.6) translateX(60px) translateY(-20px);max-height:0;margin:0;padding:0;border-width:0;}
 }
-.choice-btn.collapse-out{animation:choiceCollapseOut 0.7s var(--ease-out-expo) forwards;pointer-events:none;overflow:hidden;}
+.choice-btn.collapse-out{animation:choiceCollapseOut 0.55s var(--ease-out-expo) forwards;pointer-events:none;overflow:hidden;}
 
 /* ====== V21.2: 悬浮继续按钮 — 滚动隐藏/静止出现,按道路主题配色 ====== */
 .floating-continue-btn{

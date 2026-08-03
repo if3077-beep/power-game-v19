@@ -2647,20 +2647,24 @@ function getChannelWindfallEvent(scenarioKey) {
 // --- V21.7: 统一选项处理 — 选中高亮,未选先模糊再优雅收纳 ---
 function settleChoices(selectedIndex) {
   const btns = document.querySelectorAll('.choices-container .choice-btn');
+  let unselectedIdx = 0;
   btns.forEach((b, j) => {
     b.style.pointerEvents = 'none';
     if (j === selectedIndex) {
       b.classList.add('clicked');
       b.style.opacity = '1';
     } else {
-      // 先高斯模糊淡出,延迟后触发收纳动画
+      // 先高斯模糊淡出,错峰触发收纳动画(每个未选项间隔 80ms)
+      const stagger = unselectedIdx * 80;
+      unselectedIdx++;
+      b.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
       b.style.opacity = '0.2';
-      b.style.filter = 'blur(1px)';
+      b.style.filter = 'blur(2px)';
       setTimeout(() => {
         if (!b || !b.parentNode) return;
         b.classList.add('collapse-out');
-        setTimeout(() => { if (b && b.parentNode) b.style.display = 'none'; }, 700);
-      }, 450);
+        setTimeout(() => { if (b && b.parentNode) b.style.display = 'none'; }, 600);
+      }, 200 + stagger);
     }
   });
 }
