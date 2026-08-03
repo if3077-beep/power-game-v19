@@ -2919,7 +2919,7 @@ function makeChoice(index) {
         setTimeout(() => { earlyBtn.style.transition = 'all 0.5s ease'; earlyBtn.style.opacity = '1'; }, 200);
       }
     }
-  }, 0);
+  }, 300);
 }
 
 // --- V9: 随机事件系统 ---
